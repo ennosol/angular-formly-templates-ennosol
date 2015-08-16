@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>My HTML File</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/api-check/7.5.0/api-check.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-formly/6.23.2/formly.min.js"></script>
+    <script type="text/javascript" src="../dist/angular-formly-templates-ennosol.js"></script>
+</head>
+<body class="container">
+
+    <h1>hello</h1>
+
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <form ng-submit="onSubmit()">
+            <formly-form model="user" fields="fields">
+                <button type="submit">Submit</button>
+            </formly-form>
+        </form>
+        <hr>
+        {{user}}
+    </div>
+
+    <script type="text/javascript">
+        var app = angular.module('myApp', ['formly', 'formlyEnnosol']);
+        app.controller('myCtrl', function myCtrl($scope) {
+            $scope.user = {};
+            $scope.fields = [{
+                key: 'username',
+                type: 'input',
+                templateOptions: {
+                    label: 'Username',
+                    placeholder: 'johndoe',
+                    required: true,
+                    description: 'Descriptive text'
+                }
+            }, {
+                key: 'password',
+                type: 'input',
+                templateOptions: {
+                    type: 'password',
+                    label: 'Password',
+                    required: true
+                },
+                expressionProperties: {
+                    'templateOptions.disabled': '!model.username' // disabled when username is blank
+                }
+            }];
+            $scope.onSubmit = function() {
+                console.log('form submitted:', $scope.user);
+            }
+        });
+    </script>
+
+</body>
+</html>
