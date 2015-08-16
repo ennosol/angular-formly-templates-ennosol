@@ -19,7 +19,9 @@
     <div ng-app="myApp" ng-controller="myCtrl">
         <form ng-submit="onSubmit()">
             <formly-form model="user" fields="fields">
-                <button type="submit">Submit</button>
+                <div class="form-group">
+                    <button class="btn btn-o btn-primary" type="submit">Submit</button>
+                </div>
             </formly-form>
         </form>
         <hr>
@@ -30,27 +32,53 @@
         var app = angular.module('myApp', ['formly', 'formlyEnnosol']);
         app.controller('myCtrl', function myCtrl($scope) {
             $scope.user = {};
-            $scope.fields = [{
+            $scope.fields = [
+            {
+                elementAttributes: {
+                    "data-group-label": 'Név'
+                },
+                fieldGroup: [
+                    {
+                        key: 'firstname',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Keresztnév',
+                            placeholder: 'John'
+                        }
+                    },
+                    {
+                        key: 'lastname',
+                        type: 'input',
+                        templateOptions: {
+                            label: 'Vezetéknév',
+                            placeholder: 'Doe'
+                        }
+                    },
+                ]
+            },
+            {
                 key: 'username',
                 type: 'input',
                 templateOptions: {
-                    label: 'Username',
+                    label: 'Fehlasználónév',
                     placeholder: 'johndoe',
                     required: true,
                     description: 'Descriptive text'
                 }
-            }, {
+            },
+            {
                 key: 'password',
                 type: 'input',
                 templateOptions: {
                     type: 'password',
-                    label: 'Password',
+                    label: 'Jelszó',
                     required: true
                 },
                 expressionProperties: {
                     'templateOptions.disabled': '!model.username' // disabled when username is blank
                 }
-            }];
+            }
+            ];
             $scope.onSubmit = function() {
                 console.log('form submitted:', $scope.user);
             }

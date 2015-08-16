@@ -2,49 +2,46 @@ angular.module('formlyEnnosol', ['formly'], function configFormlyEnnosol(formlyC
     'use strict';
 
     // WRAPPERS
-    formlyConfigProvider.setWrapper([{
-        name: 'label',
-        templateUrl: 'templates/label.html'/*,
-        apiCheck: function(check) {
-            return ({
-                templateOptions: {
-                    label: check.string,
-                    required: check.bool.optional
-                }
-            });
-        }*/
-    }]);
+    formlyConfigProvider.setWrapper([
+        {
+            name: 'label',
+            templateUrl: 'templates/label.html'
+        }
+    ]);
 
     // TYPES
-    formlyConfigProvider.setType({
-        name: 'checkbox',
-        templateUrl: 'templates/checkbox.html'
-    });
-    formlyConfigProvider.setType({
-        name: 'input',
-        templateUrl: 'templates/input.html',
-        wrapper: ['label']
-    });
-    formlyConfigProvider.setType({
-        name: 'radio',
-        templateUrl: 'templates/radio.html'
-    });
-    formlyConfigProvider.setType({
-        name: 'range',
-        templateUrl: 'templates/range.html'
-    });
-    formlyConfigProvider.setType({
-        name: 'textarea',
-        templateUrl: 'templates/textarea.html'
-    });
-    formlyConfigProvider.setType({
-        name: 'toggle',
-        templateUrl: 'templates/toggle.html'
-    });
-    formlyConfigProvider.setType({
-        name: 'select',
-        templateUrl: 'templates/select.html'
-    });
+    formlyConfigProvider.setType([
+        {
+            name: 'checkbox',
+            templateUrl: 'templates/checkbox.html',
+            wrapper: ['label']
+        },
+        {
+            name: 'input',
+            templateUrl: 'templates/input.html',
+            wrapper: ['label']
+        },
+        {
+            name: 'radio',
+            templateUrl: 'templates/radio.html'
+        },
+        {
+            name: 'range',
+            templateUrl: 'templates/range.html'
+        },
+        {
+            name: 'textarea',
+            templateUrl: 'templates/textarea.html'
+        },
+        {
+            name: 'toggle',
+            templateUrl: 'templates/toggle.html'
+        },
+        {
+            name: 'select',
+            templateUrl: 'templates/select.html'
+        }
+    ]);
 
     // MISC
     formlyConfigProvider.templateManipulators.preWrapper.push(function ariaDescribedBy(template, options, scope) {
