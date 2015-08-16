@@ -34,9 +34,6 @@
             $scope.user = {};
             $scope.fields = [
             {
-                elementAttributes: {
-                    "data-group-label": 'Név'
-                },
                 fieldGroup: [
                     {
                         key: 'firstname',
@@ -72,7 +69,11 @@
                 templateOptions: {
                     type: 'password',
                     label: 'Jelszó',
+                    placeholder: 'Jelszó',
                     required: true
+                },
+                elementAttributes: {
+                    'type': 'password'
                 },
                 expressionProperties: {
                     'templateOptions.disabled': '!model.username' // disabled when username is blank
