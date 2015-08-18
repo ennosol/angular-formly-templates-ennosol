@@ -1,3 +1,4 @@
-<ion-checkbox ng-model="model[options.key]">
-  {{options.templateOptions.label}}
-</ion-checkbox>
+<div class="checkbox clip-check check-primary">
+    <input type="checkbox" ng-disabled="{{to.readOnly || to.disabled}}" id="{{id}}-chk" ng-model="model[options.key]">
+    <label for="{{id}}-chk">{{to.label}} {{to.required ? '*' : ''}}</label>
+</div>

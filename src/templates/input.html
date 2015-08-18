@@ -1,1 +1,4 @@
-<input class="form-control" ng-model="model[options.key]" placeholder="{{options.templateOptions.placeholder}}">
+<div class="form-group">
+    <input class="form-control" ng-model="model[options.key]" placeholder="{{to.placeholder}}" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}" type="{{to.password ? 'password' : (to.type ? to.type : 'text')}}">
+    <span class="{{to.feedback.className}} form-control-feedback">{{to.feedback.text}}</span>
+</div>

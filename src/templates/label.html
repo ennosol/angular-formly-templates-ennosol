@@ -3,5 +3,10 @@
         {{to.label}}
         {{to.required ? '*' : ''}}
     </label>
-    <formly-transclude></formly-transclude>
+    <div>
+        <formly-transclude></formly-transclude>
+    </div>
+    <em id="{{id}}_description" class="help-block" ng-if="options.templateOptions.description" style="opacity:0.6">
+        {{options.templateOptions.description}}
+    </em>
 </div>

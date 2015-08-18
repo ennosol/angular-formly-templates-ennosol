@@ -4,85 +4,360 @@
     <meta charset="utf-8">
     <title>My HTML File</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="../bower_components/switchery/dist/switchery.min.css">
+    <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css">
+    <link rel="stylesheet" href="../bower_components/select2/dist/css/select2.min.css">
+    <style>
+        .datepicker {
+            display: block !important;
+        }
+        .formly-field hr {
+            clear: both;
+            margin: 10px;
+            padding-top: 20px !important;
+            top: 10px;
+            position: relative;
+        }
+    </style>
+
+    <link rel="stylesheet" href="./app.css">
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/api-check/7.5.0/api-check.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-formly/6.23.2/formly.min.js"></script>
-    <script type="text/javascript" src="../dist/angular-formly-templates-ennosol.js"></script>
+
+    <script type="text/javascript" src="../bower_components/switchery/dist/switchery.min.js"></script>
+    <script type="text/javascript" src="../bower_components/ng-switchery/src/ng-switchery.js"></script>
+    <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
+    <script type="text/javascript" src="../bower_components/select2/dist/js/select2.min.js"></script>
+
+    <script type="text/javascript" src="../src/modules/angular-formly-templates-ennosol.js"></script>
 </head>
 <body class="container">
 
     <h1>hello</h1>
 
     <div ng-app="myApp" ng-controller="myCtrl">
+        {{user}}
+        <hr>
         <form ng-submit="onSubmit()">
             <formly-form model="user" fields="fields">
-                <div class="form-group">
-                    <button class="btn btn-o btn-primary" type="submit">Submit</button>
+                <div class="form-group col-sm-12">
+                    <hr>
+                    <button class="btn btn-o btn-primary pull-right" type="submit">Submit</button>
                 </div>
             </formly-form>
         </form>
-        <hr>
-        {{user}}
     </div>
 
     <script type="text/javascript">
-        var app = angular.module('myApp', ['formly', 'formlyEnnosol']);
-        app.controller('myCtrl', function myCtrl($scope) {
+        var app = angular.module('myApp', ['formly', 'formlyEnnosol', 'NgSwitchery']);
+        app.controller('myCtrl', function myCtrl($scope, $interval) {
             $scope.user = {};
             $scope.fields = [
-            {
-                fieldGroup: [
-                    {
-                        key: 'firstname',
-                        type: 'input',
-                        templateOptions: {
-                            label: 'Keresztnév',
-                            placeholder: 'John'
-                        }
-                    },
-                    {
-                        key: 'lastname',
-                        type: 'input',
-                        templateOptions: {
-                            label: 'Vezetéknév',
-                            placeholder: 'Doe'
-                        }
-                    },
-                ]
-            },
-            {
-                key: 'username',
-                type: 'input',
-                templateOptions: {
-                    label: 'Fehlasználónév',
-                    placeholder: 'johndoe',
-                    required: true,
-                    description: 'Descriptive text'
-                }
-            },
-            {
-                key: 'password',
-                type: 'input',
-                templateOptions: {
-                    type: 'password',
-                    label: 'Jelszó',
-                    placeholder: 'Jelszó',
-                    required: true
+                {
+                    key: 'username',
+                    type: 'static',
+                    defaultValue: 'user@example.com',
+                    className: 'col-sm-6',
+                    templateOptions: {
+                        label: 'Your username',
+                        description: 'You can\'t change this value.',
+                        required: true
+                    }
                 },
-                elementAttributes: {
-                    'type': 'password'
+                {
+                    key: 'password',
+                    type: 'input',
+                    className: 'col-sm-6',
+                    templateOptions: {
+                        label: 'Your password',
+                        placeholder: 'Password',
+                        description: 'Use capital and numeric characters too!',
+                        required: true,
+                        password: true,
+                        addonRight: {
+                            className: "glyphicon glyphicon-lock",
+                        },
+                        feedback: {
+                            className: 'glyphicon glyphicon-remove text-danger'
+                        }
+                    }
                 },
-                expressionProperties: {
-                    'templateOptions.disabled': '!model.username' // disabled when username is blank
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    elementAttributes: {
+                        'data-group-label': 'Name',
+                        'data-group-class': 'col-sm-8'
+                    },
+                    fieldGroup: [
+                        {
+                            key: 'name.firstname',
+                            type: 'input',
+                            className: 'col-sm-6',
+                            defaultValue: 'Alex',
+                            templateOptions: {
+                                label: 'First name',
+                                placeholder: 'John',
+                                readOnly: true
+                            }
+                        },
+                        {
+                            key: 'name.lastname',
+                            type: 'input',
+                            className: 'col-sm-6',
+                            templateOptions: {
+                                label: 'Last name',
+                                placeholder: 'Doe',
+                                feedback: {
+                                    className: 'glyphicon glyphicon-ok text-success'
+                                }
+                            }
+                        },
+                    ]
+                },
+                {
+                    template: '<div class="col-sm-4 padding-top-20"><p>This is an excellent place to add some help text. The fieldset (field group) to the left is 8 wide while this helper text has a width of 4.</p><p>It\'s made using a single template tag.</p><p>Generating help on the fly would be possible as well from a help file which identifies fieldGroups by their namespace and name.</p></div>'
+                },
+                {
+                    template: '<hr>'
+                },
+                {
+                    key: 'gender',
+                    type: 'select',
+                    className: 'col-sm-4',
+                    templateOptions: {
+                        label: 'Choose your gender',
+                        placeholder: 'Choose gender',
+                        options: [
+                            { name: 'male', value: 'm' },
+                            { name: 'female', value: 'f' }
+                        ],
+                        feedback: {
+                            className: 'glyphicon glyphicon-chevron-down'
+                        }
+                    }
+                },
+                {
+                    key: 'kidoradult',
+                    type: 'select',
+                    className: 'col-sm-4',
+                    defaultValue: 'adult',
+                    templateOptions: {
+                        label: 'Are you a kid or an adult?',
+                        required: true,
+                        disabled: true,
+                        options: [
+                            { name: 'I am a kid', value: 'minor' },
+                            { name: 'I am an adult', value: 'adult' }
+                        ],
+                        addonRight: {
+                            className: "glyphicon glyphicon-music",
+                            text: 'OK'
+                        }
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'coffee',
+                    type: 'checkbox',
+                    className: 'col-sm-3',
+                    templateOptions: {
+                        label: 'Do you like coffee?'
+                    }
+                },
+                {
+                    key: 'tea',
+                    type: 'checkbox',
+                    className: 'col-sm-3',
+                    defaultValue: true,
+                    templateOptions: {
+                        label: 'How about tea?'
+                    }
+                },
+                {
+                    key: 'soda',
+                    type: 'checkbox',
+                    className: 'col-sm-3',
+                    templateOptions: {
+                        label: 'Soda?',
+                        readOnly: true
+                    }
+                },
+                {
+                    key: 'choco',
+                    type: 'checkbox',
+                    className: 'col-sm-3',
+                    defaultValue: true,
+                    templateOptions: {
+                        label: 'Hot chocolate?',
+                        description: 'Everyone does!',
+                        readOnly: true
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'favorite',
+                    type: 'radio-inline',
+                    className: 'col-sm-5',
+                    templateOptions: {
+                        label: 'Which one do you like the most?',
+                        options: [
+                            { name: 'Tea', value: 'tea' },
+                            { name: 'Coffee', value: 'coffee' },
+                            { name: 'Soda', value: 'soda' },
+                            { name: 'Hot choco', value: 'chocolate' }
+                        ]
+                    }
+                },
+                {
+                    key: 'leastfavorite',
+                    type: 'radio',
+                    className: 'col-sm-3',
+                    defaultValue: 'soda',
+                    templateOptions: {
+                        label: 'Which one do you like the least?',
+                        options: [
+                            { name: 'Tea', value: 'tea' },
+                            { name: 'Coffee', value: 'coffee' },
+                            { name: 'Soda', value: 'soda' }
+                        ],
+                        readOnly: true
+                    }
+                },
+                {
+                    key: 'switchy',
+                    type: 'switch',
+                    className: 'col-sm-3',
+                    defaultValue: true,
+                    templateOptions: {
+                        label: 'This is a switch'
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'birthday',
+                    type: 'date',
+                    className: 'col-sm-3',
+                    defaultValue: '2009-06-17',
+                    templateOptions: {
+                        label: 'Your birthdate:',
+                        addonLeft: {
+                            className: "glyphicon glyphicon-calendar"
+                        },
+                        datepicker: {
+                            language: 'hu',
+                            weekStart: 1,
+                            format: 'yyyy-mm-dd'
+                        }
+                    }
+                },
+                {
+                    key: 'created',
+                    type: 'date',
+                    className: 'col-sm-2',
+                    defaultValue: '2015-08-18',
+                    templateOptions: {
+                        label: 'Created on:',
+                        readOnly: true,
+                        datepicker: {
+                            language: 'hu',
+                            weekStart: 1,
+                            format: 'yyyy-mm-dd'
+                        }
+                    }
+                },
+                {
+                    key: 'range',
+                    type: 'daterange',
+                    className: 'col-sm-4',
+                    defaultValue: { start: '2008-03-01', end: '2009-06-17' },
+                    templateOptions: {
+                        label: 'Enter a date range:',
+                        datepicker: {
+                            language: 'hu',
+                            weekStart: 1,
+                            format: 'yyyy-mm-dd',
+                            separator: {
+                                bgClassName: 'bg-primary',
+                                className: 'glyphicon glyphicon-calendar'
+                            }
+                        }
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'coords',
+                    type: 'coordinate',
+                    className: 'col-sm-4',
+                    defaultValue: { lat: 47.456230, lng: 19.040480 },
+                    templateOptions: {
+                        label: 'Enter a position:',
+                        addonLng: {
+                            bgClassName: 'bg-primary',
+                            className: 'glyphicon glyphicon-map-marker'
+                        },
+                        readOnly: true
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'remarks',
+                    type: 'textarea',
+                    className: 'col-sm-12',
+                    defaultValue: 'Hello World!',
+                    templateOptions: {
+                        label: 'Enter your nits:',
+                        addonLeft: {
+                            bgClassName: "bg-warning",
+                            className: "glyphicon glyphicon-pencil"
+                        }
+                    }
                 }
-            }
             ];
+
+            //https://api.github.com/users/ennosol/repos
+            
             $scope.onSubmit = function() {
                 console.log('form submitted:', $scope.user);
             }
+            
+            $scope.interval = $interval(function() {
+                if ($('formly-form').length > 0) {
+                    return;
+                }
+                $interval.cancel($scope.interval);
+                $('ng-form.formly')
+                    .wrap('<fieldset></fieldset>')
+                    .parent()
+                    .prepend(function() {
+                        var fc = $(':first-child', this);
+                        var c = fc.attr('data-group-class');
+                        c = typeof c === 'undefined' ? '' : c;
+                        fc.parent().parent().addClass(c);
+                        fc.parent().removeClass(c);
+                        var v = fc.attr('data-group-label');
+                        v = typeof v === 'undefined' ? '' : v;
+                        return '<legend>' + v + '</legend>';
+                    });
+            }, 100);
         });
     </script>
 
