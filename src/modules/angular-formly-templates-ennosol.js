@@ -52,8 +52,71 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery'], function configFormly
         templateUrl: '/src/templates/textarea.html',
         wrapper: ['addons', 'label']
     }, {
+        name: 'search',
+        templateUrl: '/src/templates/search.html',
+        wrapper: ['addons', 'label']
+    }, {
         name: 'select',
         templateUrl: '/src/templates/select.html',
         wrapper: ['addons', 'label']
     }]);
+})
+
+// select2 wrapper
+.directive('formlyEnnosolSelect', function($compile) {
+    return {
+        scope: {
+            sourceUrl: '@',
+            minInputLength: '@',
+            multiple: '@',
+            placeholder: '@',
+            templateResult: '=',
+            processResults: '=',
+            templateSelection: '=',
+            escapeMarkup: '=',
+            dataFn: '='
+        },
+        link: function(scope, element, attrs) {
+
+            attrs.$observe('sourceUrl', function() {
+                scope.update();
+            });
+
+            scope.setup = function() {
+                return {
+                    ajax: {
+                        url: scope.sourceUrl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return scope.dataFn(params);
+                        },
+                        processResults: function(data, page) {
+                            return scope.processResults(data, page);
+                        },
+                        cache: true
+                    },
+                    escapeMarkup: function(markup) {
+                        return scope.escapeMarkup(markup) || markup;
+                    },
+                    minimumInputLength: scope.minInputLength || 1,
+                    templateResult: function(data) {
+                        return scope.templateResult(data);
+                    },
+                    templateSelection: function(data) {
+                        return scope.templateSelection(data);
+                    },
+                    placeholder: scope.placeholder
+                };
+            };
+
+            scope.update = function() {
+                var sel = angular.element('<select id="' + attrs.id + '_select2" class="select2 form-control" ' + (scope.multiple ? ' multiple="multiple"' : '') + '></select>');
+                element.append(sel);
+                $compile(sel)(scope);
+
+                $('#' + attrs.id + '_select2').select2(scope.setup());
+            };
+        }
+    };
 });

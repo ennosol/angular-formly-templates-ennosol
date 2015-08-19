@@ -1,13 +1,8 @@
 <div class="input-group">
-    <div style="border:0" class="input-group-addon {{to.addonLat.bgClassName}}"
-         ng-if="to.addonLat">
-        <i class="{{to.addonLat.className}}" ng-if="to.addonLat.className"></i>
-        <span ng-if="to.addonLat.text">{{to.addonLat.text}}</span>
-    </div>
     <input class="form-control text-center" name="lat" ng-model="model[options.key]['lat']" placeholder="{{to.placeholder.lat}}" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}" type="text">
-    <span class="input-group-addon {{to.addonLng.bgClassName}}" style="width: 34px;height: 34px;border: 0;">
-        <i class="{{to.addonLng.className}}" ng-if="to.addonLng.className"></i>
-        <span ng-if="to.addonLng.text">{{to.addonLng.text}}</span>
+    <span class="input-group-addon {{to.separator.bgClassName}}" style="min-width:38px;min-height:34px;border:0;">
+        <i class="{{to.separator.className}}" ng-if="to.separator.className"></i>
+        <span ng-if="to.separator.text">{{to.separator.text}}</span>
     </span>
     <input class="form-control text-center" name="lng" ng-model="model[options.key]['lng']" placeholder="{{to.placeholder.lng}}" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}" type="text">
 </div>

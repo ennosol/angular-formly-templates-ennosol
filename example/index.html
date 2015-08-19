@@ -19,6 +19,44 @@
             top: 10px;
             position: relative;
         }
+        .select2 {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            margin-top: 8px;
+            background-color: #888 !important;
+            color: #fff;
+            font-size:14px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice span {
+            color: #fff;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice span:hover {
+            color: #ccc;
+        }
+        .select2-search__inline input {
+            background-color: rgba(0,0,0,0) !important;
+        }
+        .select2-selection__arrow {
+            min-height: 32px;
+            min-width: 28px;
+        }
+        .select2-selection__rendered {
+            min-height: 27px;
+        }
+        .select2-container--default .select2-search--inline .select2-search__field {
+            min-height: 32px;
+        }
+        .select2-container--default .select2-search--inline .select2-search__field:focus {
+            background-color: rgba(0,0,0,0) !important;
+        }
+        .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
+            border-radius: 0 !important;
+            min-height: 34px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 32px !important;
+        }
     </style>
 
     <link rel="stylesheet" href="./app.css">
@@ -45,6 +83,8 @@
     <div ng-app="myApp" ng-controller="myCtrl">
         {{user}}
         <hr>
+        {{search.url}}
+        <hr>
         <form ng-submit="onSubmit()">
             <formly-form model="user" fields="fields">
                 <div class="form-group col-sm-12">
@@ -56,8 +96,10 @@
     </div>
 
     <script type="text/javascript">
-        var app = angular.module('myApp', ['formly', 'formlyEnnosol', 'NgSwitchery']);
+        var app = angular.module('myApp', ['formlyEnnosol']);
+
         app.controller('myCtrl', function myCtrl($scope, $interval) {
+
             $scope.user = {};
             $scope.fields = [
                 {
@@ -290,11 +332,11 @@
                         datepicker: {
                             language: 'hu',
                             weekStart: 1,
-                            format: 'yyyy-mm-dd',
-                            separator: {
-                                bgClassName: 'bg-primary',
-                                className: 'glyphicon glyphicon-calendar'
-                            }
+                            format: 'yyyy-mm-dd'
+                        },
+                        separator: {
+                            bgClassName: 'bg-primary',
+                            className: 'glyphicon glyphicon-calendar'
                         }
                     }
                 },
@@ -308,11 +350,57 @@
                     defaultValue: { lat: 47.456230, lng: 19.040480 },
                     templateOptions: {
                         label: 'Enter a position:',
-                        addonLng: {
+                        separator: {
                             bgClassName: 'bg-primary',
                             className: 'glyphicon glyphicon-map-marker'
                         },
                         readOnly: true
+                    }
+                },
+                {
+                    template: '<hr style="clear:both">'
+                },
+                {
+                    key: 'repo',
+                    type: 'search',
+                    className: 'col-sm-6',
+                    templateOptions: {
+                        label: 'Select a repository',
+                        placeholder: 'Choose a repo',
+                        search: {
+                            url: 'https://api.github.com/search/repositories',
+                            minInputLength: 2,
+                            dataFn: function(params) { return { q: params.term, page: params.page }; },
+                            templateSelection: function(data) { return data.full_name || data.text; },
+                            templateResult: function(data) {
+                                if (data.loading) return data.text;
+                                return '<div class="row"><div class="col-sm-2"><img src="' + data.owner.avatar_url + '" style="max-width: 100%" alt=""></div><div class="col-sm-10"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                            },
+                            processResults: function(data, page) { return { results: data.items }; },
+                            escapeMarkup: function(markup) { return markup; }
+                        }
+                    }
+                },
+                {
+                    key: 'repo2',
+                    type: 'search',
+                    className: 'col-sm-6',
+                    templateOptions: {
+                        label: 'Select other repositories',
+                        placeholder: 'Choose other repos',
+                        multiple: true,
+                        search: {
+                            url: 'https://api.github.com/search/repositories',
+                            minInputLength: 2,
+                            dataFn: function(params) { return { q: params.term, page: params.page }; },
+                            templateSelection: function(data) { return data.full_name || data.text; },
+                            templateResult: function(data) {
+                                if (data.loading) return data.text;
+                                return '<div class="row"><div class="col-sm-2"><img src="' + data.owner.avatar_url + '" style="max-width: 100%" alt=""></div><div class="col-sm-10"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                            },
+                            processResults: function(data, page) { return { results: data.items }; },
+                            escapeMarkup: function(markup) { return markup; }
+                        }
                     }
                 },
                 {
@@ -340,10 +428,15 @@
             }
             
             $scope.interval = $interval(function() {
-                if ($('formly-form').length > 0) {
+                
+                // wait until the formly-form directive is processed
+                // terribly ugly - but works!
+                if ($('formly-form').length > 0 && $('div[ng-transclude]').length != 1) {
                     return;
                 }
                 $interval.cancel($scope.interval);
+
+                // wrap fieldgroups in fieldsets and add a legend tag
                 $('ng-form.formly')
                     .wrap('<fieldset></fieldset>')
                     .parent()
@@ -357,8 +450,10 @@
                         v = typeof v === 'undefined' ? '' : v;
                         return '<legend>' + v + '</legend>';
                     });
+
             }, 100);
         });
+
     </script>
 
 </body>
