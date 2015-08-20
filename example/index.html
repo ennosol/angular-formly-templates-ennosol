@@ -72,7 +72,9 @@
     <script type="text/javascript" src="../bower_components/ng-switchery/src/ng-switchery.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
-    <script type="text/javascript" src="../bower_components/select2/dist/js/select2.min.js"></script>
+    <script type="text/javascript" src="../bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="../bower_components/select2/dist/js/i18n/hu.js"></script>
+    <script type="text/javascript" src="../bower_components/angular-ts-select2/ts-select2.js"></script>
 
     <script type="text/javascript" src="../src/modules/angular-formly-templates-ennosol.js"></script>
 </head>
@@ -98,7 +100,7 @@
     <script type="text/javascript">
         var app = angular.module('myApp', ['formlyEnnosol']);
 
-        app.controller('myCtrl', function myCtrl($scope, $interval) {
+        app.controller('myCtrl', function myCtrl($scope, $interval, $http, $q, formlyEnnosolSearchConfigService) {
 
             $scope.user = {};
             $scope.fields = [
@@ -132,7 +134,7 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     elementAttributes: {
@@ -207,7 +209,7 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     key: 'coffee',
@@ -247,7 +249,7 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     key: 'favorite',
@@ -288,7 +290,7 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     key: 'birthday',
@@ -325,7 +327,7 @@
                 {
                     key: 'range',
                     type: 'daterange',
-                    className: 'col-sm-4',
+                    className: 'col-sm-5',
                     defaultValue: { start: '2008-03-01', end: '2009-06-17' },
                     templateOptions: {
                         label: 'Enter a date range:',
@@ -341,7 +343,7 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     key: 'coords',
@@ -358,53 +360,119 @@
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
+                },
+                {
+                    key: 'news',
+                    type: 'search',
+                    className: 'col-sm-6',
+                    templateOptions: {
+                        label: 'Open news in a new window',
+                        textField: 'photo-caption',
+                        onChange: function(selection) {
+                            window.open(selection.id, '_blank');
+                        },
+                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                            dataAccessor: 'query.results.item',
+                            idField: 'link'
+                            // idField: 'guid'
+                        }), {
+                            placeholder: 'Select a recent news post',
+                            ajax: {
+                                url: 'https://query.yahooapis.com/v1/public/yql',
+                                data: function(params) {
+                                    var data = {};
+                                    data['q'] = 'select title,guid.content,link from rss where url="http://rss.news.yahoo.com/rss/topstories"';
+                                    data['format'] = 'json';
+                                    data['env'] = 'store://datatables.org/alltableswithkeys';
+                                    data['callback'] = '';
+                                    return data;
+                                }
+                            },
+                            templateSelection: function(data) {
+                                if (data.loading) return data.text;
+                                return data['title'] || data.text;
+                            },
+                            templateResult: function(data) {
+                                if (data.loading) return data.text;
+                                return '<div><strong>' + data.title + '</strong><p>' + data.link.substr(0,40) + '...</p></div>';
+                            },
+                            minimumResultsForSearch: Infinity // hides the search box
+                        })
+                    }
                 },
                 {
                     key: 'repo',
                     type: 'search',
                     className: 'col-sm-6',
                     templateOptions: {
-                        label: 'Select a repository',
-                        placeholder: 'Choose a repo',
-                        search: {
-                            url: 'https://api.github.com/search/repositories',
-                            minInputLength: 2,
-                            dataFn: function(params) { return { q: params.term, page: params.page }; },
-                            templateSelection: function(data) { return data.full_name || data.text; },
+                        label: 'Search for a repository',
+                        textFn: function(data) {
+                            return data.full_name;
+                        },
+                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                            dataAccessor: 'items',
+                            termParam: 'q'
+                        }), {
+                            placeholder: 'Choose a repo',
+                            ajax: {
+                                url: 'https://api.github.com/search/repositories'
+                            },
+                            templateSelection: function(data) {
+                                if (data.loading) return data.text;
+                                return data.full_name || data.text;
+                            },
                             templateResult: function(data) {
                                 if (data.loading) return data.text;
-                                return '<div class="row"><div class="col-sm-2"><img src="' + data.owner.avatar_url + '" style="max-width: 100%" alt=""></div><div class="col-sm-10"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
-                            },
-                            processResults: function(data, page) { return { results: data.items }; },
-                            escapeMarkup: function(markup) { return markup; }
-                        }
+                                return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                            }
+                        })
                     }
                 },
                 {
-                    key: 'repo2',
+                    key: 'multirepo',
                     type: 'search',
-                    className: 'col-sm-6',
+                    className: 'col-sm-7',
                     templateOptions: {
-                        label: 'Select other repositories',
-                        placeholder: 'Choose other repos',
-                        multiple: true,
-                        search: {
-                            url: 'https://api.github.com/search/repositories',
-                            minInputLength: 2,
-                            dataFn: function(params) { return { q: params.term, page: params.page }; },
-                            templateSelection: function(data) { return data.full_name || data.text; },
+                        label: 'Find more repositories',
+                        textFn: function(data) {
+                            return data.full_name + ' (' + data.name + ')';
+                        },
+                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                            dataAccessor: 'items',
+                            termParam: 'q'
+                        }), {
+                            multiple: true,
+                            placeholder: 'Choose other repos',
+                            ajax: {
+                                url: 'https://api.github.com/search/repositories'
+                            },
+                            templateSelection: function(data) {
+                                if (data.loading) return data.text;
+                                return data.full_name || data.text;
+                            },
                             templateResult: function(data) {
                                 if (data.loading) return data.text;
-                                return '<div class="row"><div class="col-sm-2"><img src="' + data.owner.avatar_url + '" style="max-width: 100%" alt=""></div><div class="col-sm-10"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
-                            },
-                            processResults: function(data, page) { return { results: data.items }; },
-                            escapeMarkup: function(markup) { return markup; }
+                                return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                            }
+                        })
+                    }
+                },
+                {
+                    key: 'tags',
+                    type: 'tags',
+                    className: 'col-sm-5',
+                    defaultValue: ['beta', 'xi'],
+                    templateOptions: {
+                        label: 'Enter some tags',
+                        options: ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'nu', 'xi', 'omega'],
+                        config: {
+                            placeholder: 'Enter tags here'
                         }
                     }
                 },
                 {
-                    template: '<hr style="clear:both">'
+                    template: '<hr class="clearfix">'
                 },
                 {
                     key: 'remarks',

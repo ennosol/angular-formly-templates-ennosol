@@ -1,3 +1,3 @@
 <div class="form-group">
-    <div formly-ennosol-select id="{{id}}" ng-model="model[options.key]" data-source-url="{{to.search.url}}" data-process-results="to.search.processResults" data-template-result="to.search.templateResult" data-template-selection="to.search.templateSelection" data-escape-markup="to.search.escapeMarkup" data-data-fn="to.search.dataFn" data-min-input-length="to.search.minInputLength" multiple="{{to.multiple}}" placeholder="{{to.placeholder}}"></div>
+    <select ts-select2="to.config" ng-model="model[options.key]" data-text-field="to.textField" data-text-fn="to.textFn"></select>
 </div>

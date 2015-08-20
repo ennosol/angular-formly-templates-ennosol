@@ -1,4 +1,4 @@
-angular.module('formlyEnnosol', ['formly', 'NgSwitchery'], function configFormlyEnnosol(formlyConfigProvider) {
+angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function configFormlyEnnosol(formlyConfigProvider) {
     'use strict';
 
     // WRAPPERS
@@ -56,67 +56,129 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery'], function configFormly
         templateUrl: '/src/templates/search.html',
         wrapper: ['addons', 'label']
     }, {
+        name: 'tags',
+        templateUrl: '/src/templates/tags.html',
+        wrapper: ['addons', 'label']
+    }, {
         name: 'select',
         templateUrl: '/src/templates/select.html',
         wrapper: ['addons', 'label']
     }]);
+
 })
 
-// select2 wrapper
-.directive('formlyEnnosolSelect', function($compile) {
-    return {
-        scope: {
-            sourceUrl: '@',
-            minInputLength: '@',
-            multiple: '@',
-            placeholder: '@',
-            templateResult: '=',
-            processResults: '=',
-            templateSelection: '=',
-            escapeMarkup: '=',
-            dataFn: '='
-        },
-        link: function(scope, element, attrs) {
+.service('formlyEnnosolSearchConfigService', function($q, $http) {
 
-            attrs.$observe('sourceUrl', function() {
-                scope.update();
-            });
+    this.configuration = function() {
 
-            scope.setup = function() {
-                return {
-                    ajax: {
-                        url: scope.sourceUrl,
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return scope.dataFn(params);
-                        },
-                        processResults: function(data, page) {
-                            return scope.processResults(data, page);
-                        },
-                        cache: true
-                    },
-                    escapeMarkup: function(markup) {
-                        return scope.escapeMarkup(markup) || markup;
-                    },
-                    minimumInputLength: scope.minInputLength || 1,
-                    templateResult: function(data) {
-                        return scope.templateResult(data);
-                    },
-                    templateSelection: function(data) {
-                        return scope.templateSelection(data);
-                    },
-                    placeholder: scope.placeholder
-                };
+        var self = this;
+
+        self.url = '';
+        self.method = 'get';
+        self.delay = 250;
+
+        self.idField = 'id';
+        self.dataAccessor = '';
+        self.termParam = 'query';
+        self.termAccessor = 'term';
+        self.pageParam = 'page';
+        self.pageAccessor = 'page';
+
+        self.data = function(params) {
+            var data = {};
+            data[self.cfg.termParam] = params[self.cfg.termAccessor];
+            data[self.cfg.pageParam] = params[self.cfg.pageAccessor];
+            return data;
+        };
+
+        self.processResults = function(data, page) {
+
+            // access the target array
+            if (self.cfg.dataAccessor !== '') {
+                var accessor = self.cfg.dataAccessor.split('.');
+                do {
+                    var a = accessor.splice(0, 1);
+                    if (angular.isNumber(a)) a = a * 1;
+                    data = data[a];
+                } while (accessor.length > 0);
+            }
+
+            // make sure we have an id
+            if (self.cfg.idField !== 'id') {
+                data.forEach(function(elem, ndx, arr) {
+                    arr[ndx]['id'] = arr[ndx][self.cfg.idField];
+                });
+            }
+
+            return {
+                results: data
             };
+        };
 
-            scope.update = function() {
-                var sel = angular.element('<select id="' + attrs.id + '_select2" class="select2 form-control" ' + (scope.multiple ? ' multiple="multiple"' : '') + '></select>');
-                element.append(sel);
-                $compile(sel)(scope);
+        self.templateResult = function(data) {
+            return data.text;
+        };
 
-                $('#' + attrs.id + '_select2').select2(scope.setup());
+        self.templateSelection = function(data) {
+            return data.text;
+        };
+
+        self.escapeMarkup = function(markup) {
+            return markup;
+        };
+
+        self.getConfig = function(config) {
+            if (typeof config === 'undefined') {
+                config = {};
+            }
+            self.cfg = angular.merge({}, self, config);
+            return {
+                ajax: {
+                    type: self.cfg.method,
+                    method: self.cfg.method,
+                    dataType: 'json',
+                    delay: self.cfg.delay,
+                    cache: true,
+                    transport: self.cfg.jTransport,
+                    url: self.cfg.url,
+                    data: self.cfg.data,
+                    params: self.cfg.data,
+                    processResults: self.cfg.processResults
+                },
+                templateResult: self.cfg.templateResult,
+                templateSelection: self.cfg.templateSelection,
+                escapeMarkup: self.cfg.escapeMarkup
             };
-        }
+        };
+        self.getConfig({});
+
+        self.jTransport = function(params, success, failure) {
+            var $request = $.ajax(params);
+     
+            $request.then(success);
+            $request.fail(failure);
+         
+            return $request;
+        };
+
+        self.aTransport = function(params, success, failure) {
+            var timeout = $q.defer();
+
+            params.method = params.type;
+            params.params = params.data;
+
+            angular.extend({
+                timeout: timeout
+            }, params);
+
+            $http(params).then(function(response) {
+                success(response.data);
+            }, failure);
+
+            return {
+                abort: timeout.resolve
+            };
+        };
     };
 });
+
