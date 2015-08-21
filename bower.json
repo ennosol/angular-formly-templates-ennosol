@@ -1,6 +1,6 @@
 {
   "name": "angular-formly-templates-ennosol",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "homepage": "https://github.com/ennosol/angular-formly-templates-ennosol",
   "authors": [
     "Konrad Kiss <konrad.kiss@ennosol.eu>"
@@ -36,6 +36,14 @@
   "devDependencies": {
     "chai": "~1.9.1",
     "mocha": "~1.21.4"
+  },
+  "overrides": {
+    "select2": {
+      "main": [
+        "dist/js/select2.full.js",
+        "dist/css/select2.css"
+      ]
+    }
   },
   "resolutions": {
     "angular-ts-select2": "master"
