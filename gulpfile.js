@@ -32,7 +32,7 @@ gulp.task('template', function() {
             filename: nslTemplates + ".js",
             module: 'formlyEnnosol',
             path: function(path, base) {
-                return path.replace(base, 'templates/');
+                return path.replace(base, '/src/templates/');
             },
             header: 'angular.module("<%= module %>").run(["$templateCache", function($templateCache) {'
 
