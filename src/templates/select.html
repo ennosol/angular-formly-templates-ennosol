@@ -1,6 +1,3 @@
 <div class="form-group">
-    <select class="form-control" ng-model="model[options.key]" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}">
-        <option ng-repeat="(key, option) in to.options" ng-if="(!to.readOnly && !to.disabled) || option[to.valueProp || 'value'] === options.defaultValue" ng-value="option[to.valueProp || 'value']" ng-selected="options.defaultValue==option[to.valueProp || 'value']">{{option[to.labelProp || 'name']}}</option>
-    </select>
-    <span class="{{to.feedback.className}} form-control-feedback">{{to.feedback.text}}</span>
+    <select ts-select2="to.config" ng-model="model[options.key]" ng-options="option.name for option in to.options track by option.value"></select>
 </div>
