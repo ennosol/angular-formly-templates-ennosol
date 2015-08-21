@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../bower_components/switchery/dist/switchery.min.css">
     <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="../bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../bower_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css">
     <style>
         .datepicker {
             display: block !important;
@@ -75,6 +76,7 @@
     <script type="text/javascript" src="../bower_components/select2/dist/js/select2.full.min.js"></script>
     <script type="text/javascript" src="../bower_components/select2/dist/js/i18n/hu.js"></script>
     <script type="text/javascript" src="../bower_components/angular-ts-select2/ts-select2.js"></script>
+    <script type="text/javascript" src="../bower_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js"></script>
 
     <script type="text/javascript" src="../src/modules/angular-formly-templates-ennosol.js"></script>
 </head>
@@ -363,111 +365,168 @@
                     template: '<hr class="clearfix">'
                 },
                 {
-                    key: 'news',
-                    type: 'search',
-                    className: 'col-sm-6',
-                    templateOptions: {
-                        label: 'Open news in a new window',
-                        textField: 'photo-caption',
-                        onChange: function(selection) {
-                            window.open(selection.id, '_blank');
+                    template: '<div class="bs-callout bs-callout-info clearfix margin-top-20 col-sm-5 well well-lg" id="callout-helper-bg-specificity"><h4>Dealing with specificity</h4><p>Sometimes contextual background classes cannot be applied due to the specificity of another selector.</p></div>'
+                },
+                {
+                    elementAttributes: {
+                        'data-group-label': 'Searches and tags',
+                        'data-group-class': 'col-sm-7'
+                    },
+                    fieldGroup: [
+                        {
+                            key: 'news',
+                            type: 'search',
+                            className: 'col-sm-12',
+                            templateOptions: {
+                                label: 'Choose and open a news report in a new window',
+                                textField: 'photo-caption',
+                                onChange: function(selection) {
+                                    window.open(selection.id, '_blank');
+                                },
+                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                    dataAccessor: 'query.results.item',
+                                    idField: 'link'
+                                    // idField: 'guid'
+                                }), {
+                                    placeholder: 'Select a recent news post',
+                                    ajax: {
+                                        url: 'https://query.yahooapis.com/v1/public/yql',
+                                        data: function(params) {
+                                            var data = {};
+                                            data['q'] = 'select title,guid.content,link from rss where url="http://rss.news.yahoo.com/rss/topstories"';
+                                            data['format'] = 'json';
+                                            data['env'] = 'store://datatables.org/alltableswithkeys';
+                                            data['callback'] = '';
+                                            return data;
+                                        }
+                                    },
+                                    templateSelection: function(data) {
+                                        if (data.loading) return data.text;
+                                        return data['title'] || data.text;
+                                    },
+                                    templateResult: function(data) {
+                                        if (data.loading) return data.text;
+                                        return '<div><strong>' + data.title + '</strong><p>' + data.link.substr(0,40) + '...</p></div>';
+                                    },
+                                    minimumResultsForSearch: Infinity // hides the search box
+                                })
+                            }
                         },
-                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
-                            dataAccessor: 'query.results.item',
-                            idField: 'link'
-                            // idField: 'guid'
-                        }), {
-                            placeholder: 'Select a recent news post',
-                            ajax: {
-                                url: 'https://query.yahooapis.com/v1/public/yql',
-                                data: function(params) {
-                                    var data = {};
-                                    data['q'] = 'select title,guid.content,link from rss where url="http://rss.news.yahoo.com/rss/topstories"';
-                                    data['format'] = 'json';
-                                    data['env'] = 'store://datatables.org/alltableswithkeys';
-                                    data['callback'] = '';
-                                    return data;
+                        {
+                            key: 'repo',
+                            type: 'search',
+                            className: 'col-sm-12',
+                            templateOptions: {
+                                label: 'Search for a repository',
+                                textFn: function(data) {
+                                    return data.full_name;
+                                },
+                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                    dataAccessor: 'items',
+                                    termParam: 'q'
+                                }), {
+                                    placeholder: 'Choose a repo',
+                                    ajax: {
+                                        url: 'https://api.github.com/search/repositories'
+                                    },
+                                    templateSelection: function(data) {
+                                        if (data.loading) return data.text;
+                                        return data.full_name || data.text;
+                                    },
+                                    templateResult: function(data) {
+                                        if (data.loading) return data.text;
+                                        return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                                    }
+                                })
+                            }
+                        },
+                        {
+                            key: 'multirepo',
+                            type: 'search',
+                            className: 'col-sm-12',
+                            templateOptions: {
+                                label: 'Find more repositories',
+                                textFn: function(data) {
+                                    return data.full_name + ' (' + data.name + ')';
+                                },
+                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                    dataAccessor: 'items',
+                                    termParam: 'q'
+                                }), {
+                                    multiple: true,
+                                    placeholder: 'Choose other repos',
+                                    ajax: {
+                                        url: 'https://api.github.com/search/repositories'
+                                    },
+                                    templateSelection: function(data) {
+                                        if (data.loading) return data.text;
+                                        return data.full_name || data.text;
+                                    },
+                                    templateResult: function(data) {
+                                        if (data.loading) return data.text;
+                                        return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
+                                    }
+                                })
+                            }
+                        },
+                        {
+                            key: 'tags',
+                            type: 'tags',
+                            className: 'col-sm-12',
+                            defaultValue: ['beta', 'xi'],
+                            templateOptions: {
+                                label: 'Enter some tags',
+                                options: ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'nu', 'xi', 'omega'],
+                                config: {
+                                    placeholder: 'Enter tags here'
                                 }
-                            },
-                            templateSelection: function(data) {
-                                if (data.loading) return data.text;
-                                return data['title'] || data.text;
-                            },
-                            templateResult: function(data) {
-                                if (data.loading) return data.text;
-                                return '<div><strong>' + data.title + '</strong><p>' + data.link.substr(0,40) + '...</p></div>';
-                            },
-                            minimumResultsForSearch: Infinity // hides the search box
-                        })
-                    }
-                },
-                {
-                    key: 'repo',
-                    type: 'search',
-                    className: 'col-sm-6',
-                    templateOptions: {
-                        label: 'Search for a repository',
-                        textFn: function(data) {
-                            return data.full_name;
-                        },
-                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
-                            dataAccessor: 'items',
-                            termParam: 'q'
-                        }), {
-                            placeholder: 'Choose a repo',
-                            ajax: {
-                                url: 'https://api.github.com/search/repositories'
-                            },
-                            templateSelection: function(data) {
-                                if (data.loading) return data.text;
-                                return data.full_name || data.text;
-                            },
-                            templateResult: function(data) {
-                                if (data.loading) return data.text;
-                                return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
                             }
-                        })
+                        }
+                    ]
+                },
+                {
+                    template: '<hr class="clearfix">'
+                },
+                {
+                    key: 'age',
+                    type: 'spinner',
+                    className: 'col-sm-4',
+                    defaultValue: 25,
+                    templateOptions: {
+                        label: 'Enter your age:',
+                        data: {
+                            min: 18,
+                            max: 99,
+                            postfix: 'yrs'
+                        }
                     }
                 },
                 {
-                    key: 'multirepo',
-                    type: 'search',
-                    className: 'col-sm-7',
+                    key: 'money',
+                    type: 'spinner',
+                    className: 'col-sm-4',
+                    defaultValue: '100.00',
                     templateOptions: {
-                        label: 'Find more repositories',
-                        textFn: function(data) {
-                            return data.full_name + ' (' + data.name + ')';
-                        },
-                        config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
-                            dataAccessor: 'items',
-                            termParam: 'q'
-                        }), {
-                            multiple: true,
-                            placeholder: 'Choose other repos',
-                            ajax: {
-                                url: 'https://api.github.com/search/repositories'
-                            },
-                            templateSelection: function(data) {
-                                if (data.loading) return data.text;
-                                return data.full_name || data.text;
-                            },
-                            templateResult: function(data) {
-                                if (data.loading) return data.text;
-                                return '<div class="row"><div class="col-sm-3"><img src="' + data.owner.avatar_url + '" class="img-thumbnail" alt=""></div><div class="col-sm-9"><strong>' + (data.full_name || data.text) + '</strong><p>watchers: ' + data.watchers + ', forks: ' + data.forks + '</p></div></div>';
-                            }
-                        })
+                        label: 'Donate some money to charity:',
+                        data: {
+                            min: 0,
+                            max: 100000,
+                            step: 10,
+                            decimals: 2,
+                            prefix: '$'
+                        }
                     }
                 },
                 {
-                    key: 'tags',
-                    type: 'tags',
-                    className: 'col-sm-5',
-                    defaultValue: ['beta', 'xi'],
+                    key: 'number',
+                    type: 'spinner',
+                    className: 'col-sm-4',
+                    defaultValue: '16',
                     templateOptions: {
-                        label: 'Enter some tags',
-                        options: ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'nu', 'xi', 'omega'],
-                        config: {
-                            placeholder: 'Enter tags here'
+                        label: 'Choose your favorite number',
+                        data: {
+                            min: 0,
+                            max: 100,
                         }
                     }
                 },

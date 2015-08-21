@@ -30,7 +30,8 @@
     "ng-switchery": "~1.0.0-alpha7",
     "bootstrap-datepicker": "~1.4.0",
     "select2": "~4.0.0",
-    "angular-ts-select2": "git+https://github.com/ennosol/angular-ts-select2.git#master"
+    "angular-ts-select2": "git+https://github.com/ennosol/angular-ts-select2.git#master",
+    "bootstrap-touchspin": "~3.0.1"
   },
   "devDependencies": {
     "chai": "~1.9.1",
