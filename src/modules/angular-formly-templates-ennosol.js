@@ -145,7 +145,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             for (var i = 0; i < segLen; ++i) {
                 var seg = segments[i];
 
-                if (typeof object !== 'object') {
+                if (Object.prototype.toString.call(object) !== '[object Object]') {
                     continue;
                 }
 
@@ -165,7 +165,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             model = 'model';
         }
 
-        if (typeof scope[model] !== 'object') {
+        if (Object.prototype.toString.call(scope[model]) !== '[object Object]') {
             scope[model] = {};
         }
 
@@ -173,7 +173,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
 
             scope[dotModel] = {};
 
-            if (typeof value !== 'object') {
+            if (Object.prototype.toString.call(value) !== '[object Object]') {
                 return;
             }
 

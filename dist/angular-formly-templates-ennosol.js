@@ -145,7 +145,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ["formly
             for (var i = 0; i < segLen; ++i) {
                 var seg = segments[i];
 
-                if (typeof object !== 'object') {
+                if (Object.prototype.toString.call(object) !== '[object Object]') {
                     continue;
                 }
 
@@ -165,7 +165,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ["formly
             model = 'model';
         }
 
-        if (typeof scope[model] !== 'object') {
+        if (Object.prototype.toString.call(scope[model]) !== '[object Object]') {
             scope[model] = {};
         }
 
@@ -173,7 +173,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ["formly
 
             scope[dotModel] = {};
 
-            if (typeof value !== 'object') {
+            if (Object.prototype.toString.call(value) !== '[object Object]') {
                 return;
             }
 
@@ -326,8 +326,8 @@ $templateCache.put("/src/templates/input.html","<div class=\"form-group\"><input
 $templateCache.put("/src/templates/label.html","<div class=\"form-group\"><label for=\"{{id}}\" class=\"control-label\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label><div><formly-transclude></formly-transclude></div><em id=\"{{id}}_description\" class=\"help-block\" ng-if=\"options.templateOptions.description\" style=\"opacity:0.6\">{{options.templateOptions.description}}</em></div>");
 $templateCache.put("/src/templates/radio-inline.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio-inline\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'value\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'name\']}}</label></div></div>");
 $templateCache.put("/src/templates/radio.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio margin-right-20\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'value\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'name\']}}</label></div></div>");
-$templateCache.put("/src/templates/search.html","<div class=\"form-group\"><select ts-select2=\"to.config\" ng-model=\"model[options.key]\" data-text-field=\"to.textField\" data-text-fn=\"to.textFn\"></select></div>");
-$templateCache.put("/src/templates/select.html","<div class=\"form-group\"><select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"option.name for option in to.options track by option.value\"></select></div>");
+$templateCache.put("/src/templates/search.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" data-text-field=\"to.textField\" data-text-fn=\"to.textFn\"></select>");
+$templateCache.put("/src/templates/select.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"option.name for option in to.options track by option.value\"></select>");
 $templateCache.put("/src/templates/spinner.html","<div class=\"form-group\"><input nsl-touchspin=\"\" class=\"form-control text-center\" type=\"text\" ng-model=\"model[options.key]\" data-min=\"to.data.min\" data-max=\"to.data.max\" data-step=\"to.data.step\" data-stepinterval=\"to.data.stepInterval\" data-decimals=\"to.data.decimals\" data-boost-at=\"to.data.boostAt\" data-max-boosted-step=\"to.data.maxBoostedStep\" data-prefix=\"to.data.prefix\" data-postfix=\"to.data.postfix\" data-vertical-buttoms=\"to.data.verticalButtons\"></div>");
 $templateCache.put("/src/templates/static.html","<div class=\"form-group\"><p class=\"form-control-static\">{{model[options.key]}}</p></div>");
 $templateCache.put("/src/templates/switch.html","<input type=\"checkbox\" class=\"js-switch\" ui-switch=\"\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\">");
