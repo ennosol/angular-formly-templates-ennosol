@@ -112,7 +112,96 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ["formly
     };
 })
 
-.service('formlyEnnosolSearchConfigService', ["$q", "$http", function($q, $http) {
+.service('formlyEnnosolCfg', ["$q", "$http", function($q, $http) {
+
+    // This allows the controller to handle dot notation syntax
+    // when addressing the model.
+    // This also disallows the use of dots in keys
+    this.initDotModel = function(scope, model, dotModel) {
+
+        var self = this;
+
+        // Access an object's properties via dot notation
+        // Creates any keys not yet present as objects
+        self.dotGet = function(o, s) {
+            s = s.replace(/\[(\w+)\]/g, '.$1');
+            s = s.replace(/^\./, '');
+            var a = s.split('.');
+            for (var i = 0, n = a.length; i < n; ++i) {
+                var k = a[i];
+                if (!(k in o)) {
+                    o[k] = {};
+                }
+                o = o[k];
+            }
+            return o;
+        };
+
+        self.dotSet = function(object, dotNotation, value) {
+
+            var segments = dotNotation.split('.');
+            var segLen = segments.length;
+
+            for (var i = 0; i < segLen; ++i) {
+                var seg = segments[i];
+
+                if (typeof object !== 'object') {
+                    continue;
+                }
+
+                if (!(seg in object)) {
+                    object[seg] = {};
+                }
+
+                if (i === segLen - 1) {
+                    object[seg] = value;
+                } else {
+                    object = object[seg];
+                }
+            }
+        };
+
+        if (typeof model === 'undefined') {
+            model = 'model';
+        }
+
+        if (typeof scope[model] !== 'object') {
+            scope[model] = {};
+        }
+
+        scope.$watch(model, function(value) {
+
+            scope[dotModel] = {};
+
+            if (typeof value !== 'object') {
+                return;
+            }
+
+            // Update the model
+            for (var prop in value) {
+
+                var oprop = prop;
+                prop = prop.replace(/\[(\w+)\]/g, '.$1');
+                prop = prop.replace(/^\./, '');
+
+                if (prop.indexOf('.') > 0) {
+                    self.dotSet(scope[model], prop, value[prop]);
+                }
+            }
+
+            // Update the dot copy of the model (this is read-only!)
+            for (var prop in value) {
+
+                var oprop = prop;
+                prop = prop.replace(/\[(\w+)\]/g, '.$1');
+                prop = prop.replace(/^\./, '');
+
+                if (prop.indexOf('.') <= 0) {
+                    scope[dotModel][prop] = scope[model][prop];
+                }
+            }
+        }, true);
+    };
 
     this.configuration = function() {
 

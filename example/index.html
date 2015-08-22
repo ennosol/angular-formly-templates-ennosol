@@ -85,7 +85,11 @@
     <h1>hello</h1>
 
     <div ng-app="myApp" ng-controller="myCtrl">
+        <h4>User model:</h4>
         {{user}}
+        <hr>
+        <h4>Cleaned up user model (using initDotModel):</h4>
+        {{dotUser}}
         <hr>
         {{search.url}}
         <hr>
@@ -102,7 +106,7 @@
     <script type="text/javascript">
         var app = angular.module('myApp', ['formlyEnnosol']);
 
-        app.controller('myCtrl', function myCtrl($scope, $interval, $http, $q, formlyEnnosolSearchConfigService) {
+        app.controller('myCtrl', function myCtrl($scope, $interval, $http, $q, formlyEnnosolCfg) {
 
             $scope.user = {};
             $scope.fields = [
@@ -145,7 +149,7 @@
                     },
                     fieldGroup: [
                         {
-                            key: 'name.firstname',
+                            key: 'name.first',
                             type: 'input',
                             className: 'col-sm-6',
                             defaultValue: 'Alex',
@@ -156,7 +160,7 @@
                             }
                         },
                         {
-                            key: 'name.lastname',
+                            key: 'name.last',
                             type: 'input',
                             className: 'col-sm-6',
                             templateOptions: {
@@ -387,7 +391,7 @@
                                 onChange: function(selection) {
                                     window.open(selection.id, '_blank');
                                 },
-                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                config: angular.merge({}, (new formlyEnnosolCfg.configuration()).getConfig({
                                     dataAccessor: 'query.results.item',
                                     idField: 'link'
                                     // idField: 'guid'
@@ -425,7 +429,7 @@
                                 textFn: function(data) {
                                     return data.full_name;
                                 },
-                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                config: angular.merge({}, (new formlyEnnosolCfg.configuration()).getConfig({
                                     dataAccessor: 'items',
                                     termParam: 'q'
                                 }), {
@@ -453,7 +457,7 @@
                                 textFn: function(data) {
                                     return data.full_name + ' (' + data.name + ')';
                                 },
-                                config: angular.merge({}, (new formlyEnnosolSearchConfigService.configuration()).getConfig({
+                                config: angular.merge({}, (new formlyEnnosolCfg.configuration()).getConfig({
                                     dataAccessor: 'items',
                                     termParam: 'q'
                                 }), {
@@ -581,6 +585,8 @@
                         v = typeof v === 'undefined' ? '' : v;
                         return '<legend>' + v + '</legend>';
                     });
+
+                formlyEnnosolCfg.initDotModel($scope, 'user', 'dotUser');
 
             }, 100);
         });
