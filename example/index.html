@@ -356,7 +356,11 @@
                         label: 'Enter a position:',
                         separator: {
                             bgClassName: 'bg-primary',
-                            className: 'glyphicon glyphicon-map-marker'
+                            className: 'glyphicon glyphicon-map-marker',
+                            style: 'cursor:pointer',
+                            click: function(id) {
+                                window.open('https://www.google.hu/maps/@' + $('#'+id+'_lat').val() + ',' + $('#'+id+'_lng').val());
+                            },
                         },
                         readOnly: true
                     }
