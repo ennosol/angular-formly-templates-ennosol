@@ -1,4 +1,4 @@
-angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function configFormlyEnnosol(formlyConfigProvider) {
+angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formlyConfigProvider', function configFormlyEnnosol(formlyConfigProvider) {
     'use strict';
 
     // WRAPPERS
@@ -62,14 +62,14 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
     }, {
         name: 'tags',
         templateUrl: '/src/templates/tags.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['label']
     }, {
         name: 'select',
         templateUrl: '/src/templates/select.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['label']
     }]);
 
-})
+}])
 
 .directive('nslTouchspin', function () {
     return {
@@ -112,7 +112,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
     };
 })
 
-.service('formlyEnnosolCfg', function($q, $http) {
+.service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
 
     // This allows the controller to handle dot notation syntax
     // when addressing the model.
@@ -124,9 +124,9 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
         // Access an object's properties via dot notation
         // Creates any keys not yet present as objects
         self.dotGet = function(o, s) {
-            s = s.replace(/\[(\w+)\]/g, '.$1');
-            s = s.replace(/^\./, '');
-            var a = s.split('.');
+            s = s.replace(/\[(\w+)\]/g, '--$1');
+            s = s.replace(/^--/, '');
+            var a = s.split('--');
             for (var i = 0, n = a.length; i < n; ++i) {
                 var k = a[i];
                 if (!(k in o)) {
@@ -139,7 +139,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
 
         self.dotSet = function(object, dotNotation, value) {
 
-            var segments = dotNotation.split('.');
+            var segments = dotNotation.split('--');
             var segLen = segments.length;
 
             for (var i = 0; i < segLen; ++i) {
@@ -181,10 +181,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             for (var prop in value) {
 
                 var oprop = prop;
-                prop = prop.replace(/\[(\w+)\]/g, '.$1');
-                prop = prop.replace(/^\./, '');
+                prop = prop.replace(/\[(\w+)\]/g, '--$1');
+                prop = prop.replace(/^--/, '');
 
-                if (prop.indexOf('.') > 0) {
+                if (prop.indexOf('--') > 0) {
                     self.dotSet(scope[model], prop, value[prop]);
                 }
             }
@@ -193,10 +193,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             for (var prop in value) {
 
                 var oprop = prop;
-                prop = prop.replace(/\[(\w+)\]/g, '.$1');
-                prop = prop.replace(/^\./, '');
+                prop = prop.replace(/\[(\w+)\]/g, '--$1');
+                prop = prop.replace(/^--/, '');
 
-                if (prop.indexOf('.') <= 0) {
+                if (prop.indexOf('--') <= 0) {
                     scope[dotModel][prop] = scope[model][prop];
                 }
             }
@@ -229,10 +229,12 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
 
             // access the target array
             if (self.cfg.dataAccessor !== '') {
-                var accessor = self.cfg.dataAccessor.split('.');
+                var accessor = self.cfg.dataAccessor.split('--');
                 do {
                     var a = accessor.splice(0, 1);
-                    if (angular.isNumber(a)) a = a * 1;
+                    if (angular.isNumber(a)) {
+                        a = a * 1;
+                    }
                     data = data[a];
                 } while (accessor.length > 0);
             }
@@ -240,7 +242,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             // make sure we have an id
             if (self.cfg.idField !== 'id') {
                 data.forEach(function(elem, ndx, arr) {
-                    arr[ndx]['id'] = arr[ndx][self.cfg.idField];
+                    arr[ndx].id = arr[ndx][self.cfg.idField];
                 });
             }
 
@@ -314,5 +316,4 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], function
             };
         };
     };
-});
-
+}]);
