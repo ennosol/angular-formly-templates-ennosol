@@ -200,6 +200,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
                     scope[dotModel][prop] = scope[model][prop];
                 }
             }
+
         }, true);
     };
 

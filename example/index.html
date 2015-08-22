@@ -186,10 +186,10 @@
                     templateOptions: {
                         label: 'Choose your gender',
                         placeholder: 'Choose gender',
-                        options: [
-                            { text: 'male', id: 'm' },
-                            { text: 'female', id: 'f' }
-                        ],
+                        options: {
+                            'm': 'male',
+                            'f': 'female'
+                        },
                         feedback: {
                             className: 'glyphicon glyphicon-chevron-down'
                         }
@@ -203,11 +203,10 @@
                     templateOptions: {
                         label: 'Are you a kid or an adult?',
                         required: true,
-                        disabled: true,
-                        options: [
-                            { text: 'I am a kid', id: 'minor' },
-                            { text: 'I am an adult', id: 'adult' }
-                        ],
+                        options: {
+                            'kid': 'kid',
+                            'adult': 'adult'
+                        },
                         addonRight: {
                             className: "glyphicon glyphicon-music",
                             text: 'OK'
