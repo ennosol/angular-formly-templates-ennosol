@@ -187,8 +187,8 @@
                         label: 'Choose your gender',
                         placeholder: 'Choose gender',
                         options: [
-                            { name: 'male', value: 'm' },
-                            { name: 'female', value: 'f' }
+                            { text: 'male', id: 'm' },
+                            { text: 'female', id: 'f' }
                         ],
                         feedback: {
                             className: 'glyphicon glyphicon-chevron-down'
@@ -205,8 +205,8 @@
                         required: true,
                         disabled: true,
                         options: [
-                            { name: 'I am a kid', value: 'minor' },
-                            { name: 'I am an adult', value: 'adult' }
+                            { text: 'I am a kid', id: 'minor' },
+                            { text: 'I am an adult', id: 'adult' }
                         ],
                         addonRight: {
                             className: "glyphicon glyphicon-music",
@@ -264,10 +264,10 @@
                     templateOptions: {
                         label: 'Which one do you like the most?',
                         options: [
-                            { name: 'Tea', value: 'tea' },
-                            { name: 'Coffee', value: 'coffee' },
-                            { name: 'Soda', value: 'soda' },
-                            { name: 'Hot choco', value: 'chocolate' }
+                            { text: 'Tea', id: 'tea' },
+                            { text: 'Coffee', id: 'coffee' },
+                            { text: 'Soda', id: 'soda' },
+                            { text: 'Hot choco', id: 'chocolate' }
                         ]
                     }
                 },
@@ -279,9 +279,9 @@
                     templateOptions: {
                         label: 'Which one do you like the least?',
                         options: [
-                            { name: 'Tea', value: 'tea' },
-                            { name: 'Coffee', value: 'coffee' },
-                            { name: 'Soda', value: 'soda' }
+                            { text: 'Tea', id: 'tea' },
+                            { text: 'Coffee', id: 'coffee' },
+                            { text: 'Soda', id: 'soda' }
                         ],
                         readOnly: true
                     }
@@ -392,7 +392,7 @@
                                     window.open(selection.id, '_blank');
                                 },
                                 config: angular.merge({}, (new formlyEnnosolCfg.configuration()).getConfig({
-                                    dataAccessor: 'query.results.item',
+                                    dataAccessor: 'query--results--item',
                                     idField: 'link'
                                     // idField: 'guid'
                                 }), {
