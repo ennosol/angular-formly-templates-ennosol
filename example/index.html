@@ -108,7 +108,7 @@
 
         app.controller('myCtrl', function myCtrl($scope, $interval, $http, $q, formlyEnnosolCfg) {
 
-            $scope.user = {};
+            $scope.user = { kidoradult: 'kid', gender: 'm' };
             $scope.fields = [
                 {
                     key: 'username',
@@ -199,13 +199,12 @@
                     key: 'kidoradult',
                     type: 'select',
                     className: 'col-sm-4',
-                    defaultValue: 'adult',
                     templateOptions: {
                         label: 'Are you a kid or an adult?',
                         required: true,
                         options: {
-                            'kid': 'kid',
-                            'adult': 'adult'
+                            'kid': 'Kid',
+                            'adult': 'Adult'
                         },
                         addonRight: {
                             className: "glyphicon glyphicon-music",
