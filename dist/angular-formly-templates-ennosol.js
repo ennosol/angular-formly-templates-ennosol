@@ -8,10 +8,20 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }, {
         name: 'addons',
         templateUrl: '/src/templates/addons.html'
+    }, {
+        name: 'fieldset',
+        templateUrl: '/src/templates/fieldset.html'
+    }, {
+        name: 'validation',
+        templateUrl: '/src/templates/error.html'
     }]);
 
     // TYPES
     formlyConfigProvider.setType([{
+        name: 'nested',
+        wrapper: ['fieldset'],
+        template: '<formly-form model="model[options.key]" fields="options.data.fields"></formly-form>'
+    }, {
         name: 'checkbox',
         templateUrl: '/src/templates/checkbox.html',
         wrapper: []
@@ -34,15 +44,15 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }, {
         name: 'date',
         templateUrl: '/src/templates/date.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'daterange',
         templateUrl: '/src/templates/daterange.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'coordinate',
         templateUrl: '/src/templates/coordinate.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'static',
         templateUrl: '/src/templates/static.html',
@@ -50,11 +60,11 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }, {
         name: 'textarea',
         templateUrl: '/src/templates/textarea.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'spinner',
         templateUrl: '/src/templates/spinner.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'search',
         templateUrl: '/src/templates/search.html',
@@ -113,96 +123,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 })
 
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
-
-    // This allows the controller to handle dot notation syntax
-    // when addressing the model.
-    // This also disallows the use of dots in keys
-    this.initDotModel = function(scope, model, dotModel) {
-
-        var self = this;
-
-        // Access an object's properties via dot notation
-        // Creates any keys not yet present as objects
-        self.dotGet = function(o, s) {
-            s = s.replace(/\[(\w+)\]/g, '--$1');
-            s = s.replace(/^--/, '');
-            var a = s.split('--');
-            for (var i = 0, n = a.length; i < n; ++i) {
-                var k = a[i];
-                if (!(k in o)) {
-                    o[k] = {};
-                }
-                o = o[k];
-            }
-            return o;
-        };
-
-        self.dotSet = function(object, dotNotation, value) {
-
-            var segments = dotNotation.split('--');
-            var segLen = segments.length;
-
-            for (var i = 0; i < segLen; ++i) {
-                var seg = segments[i];
-
-                if (Object.prototype.toString.call(object) !== '[object Object]') {
-                    continue;
-                }
-
-                if (!(seg in object)) {
-                    object[seg] = {};
-                }
-
-                if (i === segLen - 1) {
-                    object[seg] = value;
-                } else {
-                    object = object[seg];
-                }
-            }
-        };
-
-        if (typeof model === 'undefined') {
-            model = 'model';
-        }
-
-        if (Object.prototype.toString.call(scope[model]) !== '[object Object]') {
-            scope[model] = {};
-        }
-
-        scope.$watch(model, function(value) {
-
-            scope[dotModel] = {};
-
-            if (Object.prototype.toString.call(value) !== '[object Object]') {
-                return;
-            }
-
-            // Update the model
-            for (var prop in value) {
-
-                var oprop = prop;
-                prop = prop.replace(/\[(\w+)\]/g, '--$1');
-                prop = prop.replace(/^--/, '');
-
-                if (prop.indexOf('--') > 0) {
-                    self.dotSet(scope[model], prop, value[prop]);
-                }
-            }
-
-            // Update the dot copy of the model (this is read-only!)
-            for (var prop in value) {
-
-                var oprop = prop;
-                prop = prop.replace(/\[(\w+)\]/g, '--$1');
-                prop = prop.replace(/^--/, '');
-
-                if (prop.indexOf('--') <= 0) {
-                    scope[dotModel][prop] = scope[model][prop];
-                }
-            }
-
-        }, true);
-    };
 
     this.configuration = function() {
 
@@ -324,6 +244,8 @@ $templateCache.put("/src/templates/checkbox.html","<div class=\"checkbox clip-ch
 $templateCache.put("/src/templates/coordinate.html","<div class=\"input-group\"><input class=\"form-control text-center\" id=\"{{id}}_lat\" name=\"lat\" ng-model=\"model[options.key][\'lat\']\" placeholder=\"{{to.placeholder.lat}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;{{to.separator.style}}\" ng-click=\"to.separator.click(id)\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control text-center\" id=\"{{id}}_lng\" name=\"lng\" ng-model=\"model[options.key][\'lng\']\" placeholder=\"{{to.placeholder.lng}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div>");
 $templateCache.put("/src/templates/date.html","<div class=\"form-group\"><input class=\"form-control show text-center\" data-provide=\"{{to.readOnly || to.disabled ? \'\' : \'datepicker\'}}\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
 $templateCache.put("/src/templates/daterange.html","<div class=\"form-group\"><div class=\"input-daterange input-group\" data-provide=\"datepicker\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"><input class=\"form-control show\" name=\"start\" ng-model=\"model[options.key][\'start\']\" placeholder=\"{{to.placeholder.start}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control show\" name=\"end\" ng-model=\"model[options.key][\'end\']\" placeholder=\"{{to.placeholder.end}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div></div>");
+$templateCache.put("/src/templates/error.html","<formly-transclude></formly-transclude><div ng-messages=\"fc.$error\" ng-if=\"form.$submitted || options.formControl.$touched\" class=\"error-messages\"><div ng-message=\"{{ ::name }}\" ng-repeat=\"(name, message) in ::options.validation.messages\" class=\"message\">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div></div>");
+$templateCache.put("/src/templates/fieldset.html","<fieldset><legend>{{to.label}} {{to.required ? \'*\' : \'\'}}</legend><formly-transclude></formly-transclude></fieldset>");
 $templateCache.put("/src/templates/input.html","<div class=\"form-group\"><input class=\"form-control\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"{{to.password ? \'password\' : (to.type ? to.type : \'text\')}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
 $templateCache.put("/src/templates/label.html","<div class=\"form-group\"><label for=\"{{id}}\" class=\"control-label\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label><div><formly-transclude></formly-transclude></div><em id=\"{{id}}_description\" class=\"help-block\" ng-if=\"options.templateOptions.description\" style=\"opacity:0.6\">{{options.templateOptions.description}}</em></div>");
 $templateCache.put("/src/templates/radio-inline.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio-inline\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
