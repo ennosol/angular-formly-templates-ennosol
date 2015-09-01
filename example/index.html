@@ -84,32 +84,31 @@
 
     <h1>hello</h1>
 
-    <div ng-app="myApp" ng-controller="myCtrl">
-        <h4>User model:</h4>
-        {{user}}
+    <div ng-app="myApp" ng-controller="myCtrl as vm">
+        <h4>Model:</h4>
+        {{vm.model}}
         <hr>
-        <h4>Cleaned up user model (using initDotModel):</h4>
-        {{dotUser}}
-        <hr>
-        {{search.url}}
-        <hr>
-        <form ng-submit="onSubmit()">
-            <formly-form model="user" fields="fields">
-                <div class="form-group col-sm-12">
-                    <hr>
-                    <button class="btn btn-o btn-primary pull-right" type="submit">Submit</button>
-                </div>
-            </formly-form>
+        <form ng-submit="vm.onSubmit()" name="vm.form" novalidate>
+            <fieldset>
+                <formly-form model="vm.model" fields="vm.fields" form="vm.form" options="vm.options">
+                    <div class="form-group col-sm-12">
+                        <hr>
+                        <button type="submit" class="btn btn-primary submit-button pull-right" ng-disabled="vm.form.$pristine || vm.form.$invalid">Submit</button>
+                    </div>
+                </formly-form>
+            </fieldset>
         </form>
     </div>
 
     <script type="text/javascript">
         var app = angular.module('myApp', ['formlyEnnosol']);
 
-        app.controller('myCtrl', function myCtrl($scope, $interval, $http, $q, formlyEnnosolCfg) {
+        app.controller('myCtrl', function myCtrl($interval, $http, $q, formlyEnnosolCfg) {
 
-            $scope.user = { kidoradult: 'kid', gender: 'm' };
-            $scope.fields = [
+            var vm = this;
+            vm.options = {};
+            vm.model = { kidoradult: 'kid', gender: 'm' };
+            vm.fields = [
                 {
                     key: 'username',
                     type: 'static',
@@ -143,35 +142,39 @@
                     template: '<hr class="clearfix">'
                 },
                 {
-                    elementAttributes: {
-                        'data-group-label': 'Name',
-                        'data-group-class': 'col-sm-8'
+                    key: 'name',
+                    type: 'nested',
+                    className: 'col-sm-8',
+                    templateOptions: {
+                        label: 'Name'
                     },
-                    fieldGroup: [
-                        {
-                            key: 'name--first',
-                            type: 'input',
-                            className: 'col-sm-6',
-                            defaultValue: 'Alex',
-                            templateOptions: {
-                                label: 'First name',
-                                placeholder: 'John',
-                                readOnly: true
-                            }
-                        },
-                        {
-                            key: 'name--last',
-                            type: 'input',
-                            className: 'col-sm-6',
-                            templateOptions: {
-                                label: 'Last name',
-                                placeholder: 'Doe',
-                                feedback: {
-                                    className: 'glyphicon glyphicon-ok text-success'
+                    data: {
+                        fields: [
+                            {
+                                key: 'first',
+                                type: 'input',
+                                className: 'col-sm-6',
+                                defaultValue: 'Alex',
+                                templateOptions: {
+                                    label: 'First name',
+                                    placeholder: 'John',
+                                    readOnly: true
+                                }
+                            },
+                            {
+                                key: 'last',
+                                type: 'input',
+                                className: 'col-sm-6',
+                                templateOptions: {
+                                    label: 'Last name',
+                                    placeholder: 'Doe',
+                                    feedback: {
+                                        className: 'glyphicon glyphicon-ok text-success'
+                                    }
                                 }
                             }
-                        },
-                    ]
+                        ]
+                    }
                 },
                 {
                     template: '<div class="col-sm-4 padding-top-20"><p>This is an excellent place to add some help text. The fieldset (field group) to the left is 8 wide while this helper text has a width of 4.</p><p>It\'s made using a single template tag.</p><p>Generating help on the fly would be possible as well from a help file which identifies fieldGroups by their namespace and name.</p></div>'
@@ -554,44 +557,11 @@
                 }
             ];
 
-            //https://api.github.com/users/ennosol/repos
-            
-            $scope.onSubmit = function() {
-                console.log('form submitted:', $scope.user);
+            vm.onSubmit = function() {
+                console.log('submitted model:', vm.model);
             }
-            
-            $scope.interval = $interval(function() {
-                
-                // wait until the formly-form directive is processed
-                // terribly ugly - but works!
-                if ($('formly-form').length > 0 && $('div[ng-transclude]').length != 1) {
-                    return;
-                }
-                $interval.cancel($scope.interval);
-
-                // wrap fieldgroups in fieldsets and add a legend tag
-                $('ng-form.formly')
-                    .wrap('<fieldset></fieldset>')
-                    .parent()
-                    .prepend(function() {
-                        var fc = $(':first-child', this);
-                        var c = fc.attr('data-group-class');
-                        c = typeof c === 'undefined' ? '' : c;
-                        fc.parent().parent().addClass(c);
-                        fc.parent().removeClass(c);
-                        var v = fc.attr('data-group-label');
-                        v = typeof v === 'undefined' ? '' : v;
-                        return '<legend>' + v + '</legend>';
-                    });
-
-                console.log('$scope.fields', $scope.fields);
-
-                formlyEnnosolCfg.initDotModel($scope, 'user', 'dotUser');
-
-            }, 100);
         });
 
     </script>
-
 </body>
 </html>
