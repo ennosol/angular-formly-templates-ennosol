@@ -24,23 +24,23 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }, {
         name: 'checkbox',
         templateUrl: '/src/templates/checkbox.html',
-        wrapper: []
+        wrapper: ['validation']
     }, {
         name: 'switch',
         templateUrl: '/src/templates/switch.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }, {
         name: 'radio',
         templateUrl: '/src/templates/radio.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }, {
         name: 'radio-inline',
         templateUrl: '/src/templates/radio-inline.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }, {
         name: 'input',
         templateUrl: '/src/templates/input.html',
-        wrapper: ['addons', 'label']
+        wrapper: ['addons', 'label', 'validation']
     }, {
         name: 'date',
         templateUrl: '/src/templates/date.html',
@@ -68,15 +68,15 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }, {
         name: 'search',
         templateUrl: '/src/templates/search.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }, {
         name: 'tags',
         templateUrl: '/src/templates/tags.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }, {
         name: 'select',
         templateUrl: '/src/templates/select.html',
-        wrapper: ['label']
+        wrapper: ['label', 'validation']
     }]);
 
 }])
