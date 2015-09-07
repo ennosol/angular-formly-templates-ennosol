@@ -1,6 +1,6 @@
 {
     "name": "angular-formly-templates-ennosol",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Angular-Formly plugin which outputs bootstrap compatible form fields.",
     "author": "Konrad Kiss <konrad.kiss@ennosol.eu>",
     "licenses": [
