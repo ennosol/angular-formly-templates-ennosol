@@ -122,6 +122,25 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 })
 
+.directive('nslFormlyDatepicker', ["$timeout", function($timeout) {
+    return {
+        restrict: 'C',
+        link: function(scope, element, ngModelController) {
+            // Zero timeout for access the compiled template
+            $timeout(function() {
+                // Cut off UTC info
+                $(element).val($(element).val().substring(0, 10));
+
+                // Trigger input event for updating ng-model
+                $(element).datepicker()
+                    .on('changeDate', function() {
+                        element.trigger('input');
+                    });
+            }, 0);
+        }
+    };
+}])
+
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
 
     this.configuration = function() {
@@ -211,10 +230,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 
         self.jTransport = function(params, success, failure) {
             var $request = $.ajax(params);
-     
+
             $request.then(success);
             $request.fail(failure);
-         
+
             return $request;
         };
 
@@ -242,8 +261,8 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 angular.module("formlyEnnosol").run(["$templateCache", function($templateCache) {$templateCache.put("/src/templates/addons.html","<div ng-class=\"{\'input-group\': to.addonLeft || to.addonRight}\"><div style=\"border:0\" class=\"input-group-addon {{to.addonLeft.bgClassName}}\" ng-if=\"to.addonLeft\" ng-style=\"{cursor: to.addonLeft.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonLeft.onClick(options, this)\"><i class=\"{{to.addonLeft.className}}\" ng-if=\"to.addonLeft.className\"></i> <span ng-if=\"to.addonLeft.text\">{{to.addonLeft.text}}</span></div><formly-transclude></formly-transclude><div style=\"border:0\" class=\"input-group-addon {{to.addonRight.bgClassName}}\" ng-if=\"to.addonRight\" ng-style=\"{cursor: to.addonRight.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonRight.onClick(options, this)\"><i class=\"{{to.addonRight.className}}\" ng-if=\"to.addonRight.className\"></i> <span ng-if=\"to.addonRight.text\">{{to.addonRight.text}}</span></div></div>");
 $templateCache.put("/src/templates/checkbox.html","<div class=\"checkbox clip-check check-primary\"><input type=\"checkbox\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\"> <label for=\"{{id}}-chk\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label></div>");
 $templateCache.put("/src/templates/coordinate.html","<div class=\"input-group\"><input class=\"form-control text-center\" id=\"{{id}}_lat\" name=\"lat\" ng-model=\"model[options.key][\'lat\']\" placeholder=\"{{to.placeholder.lat}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;{{to.separator.style}}\" ng-click=\"to.separator.click(id)\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control text-center\" id=\"{{id}}_lng\" name=\"lng\" ng-model=\"model[options.key][\'lng\']\" placeholder=\"{{to.placeholder.lng}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div>");
-$templateCache.put("/src/templates/date.html","<div class=\"form-group\"><input class=\"form-control show text-center\" data-provide=\"{{to.readOnly || to.disabled ? \'\' : \'datepicker\'}}\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
-$templateCache.put("/src/templates/daterange.html","<div class=\"form-group\"><div class=\"input-daterange input-group\" data-provide=\"datepicker\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"><input class=\"form-control show\" name=\"start\" ng-model=\"model[options.key][\'start\']\" placeholder=\"{{to.placeholder.start}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control show\" name=\"end\" ng-model=\"model[options.key][\'end\']\" placeholder=\"{{to.placeholder.end}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div></div>");
+$templateCache.put("/src/templates/date.html","<div class=\"form-group\"><input class=\"form-control show text-center nslFormlyDatepicker\" data-provide=\"{{to.readOnly || to.disabled ? \'\' : \'datepicker\'}}\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
+$templateCache.put("/src/templates/daterange.html","<div class=\"form-group\"><div class=\"input-daterange input-group\" data-provide=\"datepicker\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"><input class=\"form-control show nslFormlyDatepicker\" name=\"start\" ng-model=\"model[options.key][\'start\']\" placeholder=\"{{to.placeholder.start}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control show nslFormlyDatepicker\" name=\"end\" ng-model=\"model[options.key][\'end\']\" placeholder=\"{{to.placeholder.end}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div></div>");
 $templateCache.put("/src/templates/error.html","<formly-transclude></formly-transclude><div ng-messages=\"fc.$error\" ng-if=\"options.validation.errorExistsAndShouldBeVisible\" class=\"error-messages\"><div ng-message=\"{{ ::name }}\" ng-repeat=\"(name, message) in ::options.validation.messages\" class=\"message\">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div></div>");
 $templateCache.put("/src/templates/fieldset.html","<fieldset><legend>{{to.label}} {{to.required ? \'*\' : \'\'}}</legend><formly-transclude></formly-transclude></fieldset>");
 $templateCache.put("/src/templates/input.html","<div class=\"form-group\"><input class=\"form-control\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"{{to.password ? \'password\' : (to.type ? to.type : \'text\')}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");

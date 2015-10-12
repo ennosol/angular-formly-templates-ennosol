@@ -122,6 +122,25 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 })
 
+.directive('nslFormlyDatepicker', function($timeout) {
+    return {
+        restrict: 'C',
+        link: function(scope, element, ngModelController) {
+            // Zero timeout for access the compiled template
+            $timeout(function() {
+                // Cut off UTC info
+                $(element).val($(element).val().substring(0, 10));
+
+                // Trigger input event for updating ng-model
+                $(element).datepicker()
+                    .on('changeDate', function() {
+                        element.trigger('input');
+                    });
+            }, 0);
+        }
+    };
+})
+
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
 
     this.configuration = function() {
@@ -211,10 +230,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 
         self.jTransport = function(params, success, failure) {
             var $request = $.ajax(params);
-     
+
             $request.then(success);
             $request.fail(failure);
-         
+
             return $request;
         };
 
