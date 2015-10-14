@@ -77,8 +77,12 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         name: 'select',
         templateUrl: '/src/templates/select.html',
         wrapper: ['label', 'validation']
+    }, {
+        name: 'repeatSection',
+        templateUrl: '/src/templates/repeat-section.html',
+        wrapper: [],
+        controller: 'RepeatSectionController'
     }]);
-
 }])
 
 .directive('nslTouchspin', function () {
@@ -125,7 +129,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 .directive('nslFormlyDatepicker', function($timeout) {
     return {
         restrict: 'C',
-        link: function(scope, element, ngModelController) {
+        link: function(scope, element) {
             // Zero timeout for access the compiled template
             $timeout(function() {
                 // Cut off UTC info
@@ -141,10 +145,53 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 })
 
+.controller('RepeatSectionController', function($scope) {
+    var unique = 1;
+
+    $scope.formOptions = {formState: $scope.formState};
+        $scope.addNew = addNew;
+        $scope.copyFields = copyFields;
+
+        function copyFields(fields) {
+            fields = angular.copy(fields);
+            addRandomIds(fields);
+            return fields;
+        }
+
+        function addNew() {
+            $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
+            var repeatsection = $scope.model[$scope.options.key];
+            var lastSection = repeatsection[repeatsection.length - 1];
+            var newsection = {};
+            if (lastSection) {
+                newsection = angular.copy(lastSection);
+            }
+            repeatsection.push(newsection);
+        }
+
+        function addRandomIds(fields) {
+            unique++;
+            angular.forEach(fields, function(field, index) {
+                if (field.fieldGroup) {
+                    addRandomIds(field.fieldGroup);
+                    return; // fieldGroups don't need an ID
+                }
+
+                if (field.templateOptions && field.templateOptions.fields) {
+                    addRandomIds(field.templateOptions.fields);
+                }
+
+                field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
+            });
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+})
+
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
-
     this.configuration = function() {
-
         var self = this;
 
         self.url = '';
@@ -166,7 +213,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         };
 
         self.processResults = function(data, page) {
-
             // access the target array
             if (self.cfg.dataAccessor !== '') {
                 var accessor = self.cfg.dataAccessor.split('--');
