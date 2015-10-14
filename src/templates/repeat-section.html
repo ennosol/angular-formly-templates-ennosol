@@ -5,7 +5,7 @@
         <div class="{{hideRepeat}}">
             <div class="repeatsection" ng-repeat="element in model[options.key]" ng-init="fields = copyFields(to.fields)">
                 <formly-form fields="fields" model="element" form="form"></formly-form>
-                <div style="margin-bottom:20px;">
+                <div style="margin-bottom:20px;" class="to.removeBtnClassName" >
                     <button type="button" class="btn btn-sm btn-danger" ng-click="model[options.key].splice($index, 1)">{{to.removeBtnText}}</button>
                 </div>
                 <hr>
