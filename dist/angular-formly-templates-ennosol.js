@@ -77,8 +77,12 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         name: 'select',
         templateUrl: '/src/templates/select.html',
         wrapper: ['label', 'validation']
+    }, {
+        name: 'repeatSection',
+        templateUrl: '/src/templates/repeat-section.html',
+        wrapper: [],
+        controller: 'RepeatSectionController'
     }]);
-
 }])
 
 .directive('nslTouchspin', function () {
@@ -125,7 +129,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 .directive('nslFormlyDatepicker', ["$timeout", function($timeout) {
     return {
         restrict: 'C',
-        link: function(scope, element, ngModelController) {
+        link: function(scope, element) {
             // Zero timeout for access the compiled template
             $timeout(function() {
                 // Cut off UTC info
@@ -141,10 +145,53 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 }])
 
+.controller('RepeatSectionController', ["$scope", function($scope) {
+    var unique = 1;
+
+    $scope.formOptions = {formState: $scope.formState};
+        $scope.addNew = addNew;
+        $scope.copyFields = copyFields;
+
+        function copyFields(fields) {
+            fields = angular.copy(fields);
+            addRandomIds(fields);
+            return fields;
+        }
+
+        function addNew() {
+            $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
+            var repeatsection = $scope.model[$scope.options.key];
+            var lastSection = repeatsection[repeatsection.length - 1];
+            var newsection = {};
+            if (lastSection) {
+                newsection = angular.copy(lastSection);
+            }
+            repeatsection.push(newsection);
+        }
+
+        function addRandomIds(fields) {
+            unique++;
+            angular.forEach(fields, function(field, index) {
+                if (field.fieldGroup) {
+                    addRandomIds(field.fieldGroup);
+                    return; // fieldGroups don't need an ID
+                }
+
+                if (field.templateOptions && field.templateOptions.fields) {
+                    addRandomIds(field.templateOptions.fields);
+                }
+
+                field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
+            });
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+}])
+
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
-
     this.configuration = function() {
-
         var self = this;
 
         self.url = '';
@@ -166,7 +213,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         };
 
         self.processResults = function(data, page) {
-
             // access the target array
             if (self.cfg.dataAccessor !== '') {
                 var accessor = self.cfg.dataAccessor.split('--');
@@ -269,6 +315,7 @@ $templateCache.put("/src/templates/input.html","<div class=\"form-group\"><input
 $templateCache.put("/src/templates/label.html","<div class=\"form-group\"><label for=\"{{id}}\" class=\"control-label\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label><div><formly-transclude></formly-transclude></div><em id=\"{{id}}_description\" class=\"help-block\" ng-if=\"options.templateOptions.description\" style=\"opacity:0.6\">{{options.templateOptions.description}}</em></div>");
 $templateCache.put("/src/templates/radio-inline.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio-inline\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
 $templateCache.put("/src/templates/radio.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio margin-right-20\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
+$templateCache.put("/src/templates/repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" ng-init=\"fields = copyFields(to.fields)\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\"><button type=\"button\" class=\"btn btn-sm btn-danger\" ng-click=\"model[options.key].splice($index, 1)\">{{to.removeBtnText}}</button></div><hr></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
 $templateCache.put("/src/templates/search.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" data-text-field=\"to.textField\" data-text-fn=\"to.textFn\"></select>");
 $templateCache.put("/src/templates/select.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"key as value for (key, value) in to.options\"></select>");
 $templateCache.put("/src/templates/spinner.html","<div class=\"form-group\"><input nsl-touchspin=\"\" class=\"form-control text-center\" type=\"text\" ng-model=\"model[options.key]\" data-min=\"to.data.min\" data-max=\"to.data.max\" data-step=\"to.data.step\" data-stepinterval=\"to.data.stepInterval\" data-decimals=\"to.data.decimals\" data-boost-at=\"to.data.boostAt\" data-max-boosted-step=\"to.data.maxBoostedStep\" data-prefix=\"to.data.prefix\" data-postfix=\"to.data.postfix\" data-vertical-buttoms=\"to.data.verticalButtons\"></div>");

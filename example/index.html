@@ -86,8 +86,9 @@
 
     <div ng-app="myApp" ng-controller="myCtrl as vm">
         <h4>Model:</h4>
-        {{vm.model}}
+        <pre>{{vm.model | json}}</pre>
         <hr>
+
         <form ng-submit="vm.onSubmit()" name="vm.form" novalidate>
             <fieldset>
                 <formly-form model="vm.model" fields="vm.fields" form="vm.form" options="vm.options">
@@ -107,7 +108,31 @@
 
             var vm = this;
             vm.options = {};
-            vm.model = { kidoradult: 'kid', gender: 'm' };
+            vm.model = {
+                kidoradult: 'kid',
+                gender: 'm',
+                investments: [
+                    {
+                        investmentName:'abc',
+                        investmentDate:(new Date()).toDateString(),
+                        stockIdentifier:'',
+                        investmentValue:'',
+                        relationshipName:'',
+                        complianceApprover:'',
+                        requestorComment:''
+                    },
+                    {
+                        investmentName:'haf',
+                        investmentDate:(new Date()).toDateString(),
+                        stockIdentifier:'',
+                        investmentValue:'',
+                        relationshipName:'',
+                        complianceApprover:'',
+                        requestorComment:''
+                    }
+                ]
+            };
+
             vm.fields = [
                 {
                     key: 'username',
@@ -553,6 +578,131 @@
                             bgClassName: "bg-warning",
                             className: "glyphicon glyphicon-pencil"
                         }
+                    }
+                },
+                {
+                    type: 'repeatSection',
+                    key: 'investments',
+                    templateOptions: {
+                        label: 'Objektumok tömbje',
+                        addBtnText:'Új elem',
+                        addBtnClick: "vm.addNew",
+                        removeBtnText:'Törlés',
+                        fields: [
+                            {
+                                className: 'row',
+                                fieldGroup: [
+                                    {
+                                        className: 'col-xs-4',
+                                        type: 'input',
+                                        key: 'investmentName',
+                                        templateOptions: {
+                                            label: 'Name of Investment:',
+                                            required: true
+                                        }
+                                    },
+                                    {
+                                        type: 'input',
+                                        key: 'investmentDate',
+                                        className: 'col-xs-4',
+                                        templateOptions: {
+                                            label: 'Date of Investment:',
+                                            placeholder: 'dd/mm/yyyy such as 20/05/2015',
+                                            dateFormat: 'DD, d  MM, yy'
+                                        }
+                                    },
+                                    {
+                                        type: 'input',
+                                        key: 'stockIdentifier',
+                                        className: 'col-xs-4',
+                                        templateOptions: {
+                                            label: 'Stock Identifier:'
+                                        }
+                                    }
+                                    ]
+                            },
+                            {
+                                type: 'radio',
+                                key: 'type',
+                                templateOptions: {
+                                    options: [
+                                        {
+                                            text: 'Text Field',
+                                            id: 'input'
+                                        },
+                                        {
+                                            text: 'TextArea Field',
+                                            id: 'textarea'
+                                        },
+                                        {
+                                            text: 'Radio Buttons',
+                                            id: 'radio'
+                                        },
+                                        {
+                                            text: 'Checkbox',
+                                            id: 'checkbox'
+                                        }
+                                    ],
+                                    label: 'Field Type',
+                                    required: true
+                                }
+                            },
+                            {
+                                type: 'input',
+                                key: 'investmentValue',
+                                templateOptions: {
+                                    label: 'Value:'
+                                },
+                                expressionProperties: {
+                                    'templateOptions.disabled': '!model.stockIdentifier'
+                                }
+                            },
+                            {
+                                type: 'checkbox',
+                                model: 'formState',
+                                key: 'selfExecuting',
+                                templateOptions: {
+                                    label: 'Are you executing this trade?'
+                                }
+                            },
+                            {
+                                hideExpression: '!formState.selfExecuting',
+                                fieldGroup: [
+                                    {
+                                        type: 'input',
+                                        key: 'relationshipName',
+                                        templateOptions: {
+                                            label: 'Name:'
+                                        }
+                                    },
+                                    {
+                                        type: 'select',
+                                        key: 'complianceApprover',
+                                        templateOptions: {
+                                            label: 'Compliance Approver:',
+                                            options: [
+                                                {
+                                                    name: 'approver 1',
+                                                    value:'some one 1'
+                                                },
+                                                {
+                                                    name: 'approver 2',
+                                                    value:'some one 2'
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        type: 'textarea',
+                                        key: 'requestorComment',
+                                        templateOptions: {
+                                            label: 'Requestor Comment',
+                                            rows: 4
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 }
             ];
