@@ -163,9 +163,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
             var repeatsection = $scope.model[$scope.options.key];
             var lastSection = repeatsection[repeatsection.length - 1];
             var newsection = {};
-            if (lastSection) {
-                newsection = angular.copy(lastSection);
-            }
             repeatsection.push(newsection);
         }
 
