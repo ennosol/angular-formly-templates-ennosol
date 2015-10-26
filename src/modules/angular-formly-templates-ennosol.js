@@ -78,6 +78,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/select.html',
         wrapper: ['label', 'validation']
     }, {
+        name: 'multiSelect',
+        templateUrl: '/src/templates/multiselect.html',
+        wrapper: ['label', 'validation']
+    }, {
         name: 'repeatSection',
         templateUrl: '/src/templates/repeat-section.html',
         wrapper: [],
