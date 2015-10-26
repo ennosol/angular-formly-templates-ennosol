@@ -153,6 +153,38 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 })
 
+.directive('nslSelectWatcher', function (){
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            scope.$watch(function () {
+                return ngModel.$modelValue;
+            }, function(newValue) {
+                if (newValue === undefined) {
+                    // Check if select2 has been initialized
+                    if ($(element).next().hasClass('select2')) {
+                        $(element).select2('val', null);
+                    }
+                }
+            });
+        }
+     };
+})
+
+.directive('nslArraySelectWatcher', ["$timeout", function ($timeout){
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            // Load saved model values to multiselect input
+            $timeout(function() {
+                $(element).select2().select2('val', ngModel.$modelValue);
+            }, 0);
+        }
+     };
+}])
+
 .controller('RepeatSectionController', function($scope) {
     var unique = 1;
 
