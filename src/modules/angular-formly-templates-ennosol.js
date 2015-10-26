@@ -82,10 +82,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/multiselect.html',
         wrapper: ['label', 'validation']
     }, {
-        name: 'arrayMultiSelect',
-        templateUrl: '/src/templates/array-multiselect.html',
-        wrapper: ['label', 'validation']
-    }, {
         name: 'repeatSection',
         templateUrl: '/src/templates/repeat-section.html',
         wrapper: [],
@@ -153,34 +149,27 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 })
 
-.directive('nslSelectWatcher', function (){
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attrs, ngModel) {
-            scope.$watch(function () {
-                return ngModel.$modelValue;
-            }, function(newValue) {
-                if (newValue === undefined) {
-                    // Check if select2 has been initialized
-                    if ($(element).next().hasClass('select2')) {
-                        $(element).select2('val', null);
-                    }
-                }
-            });
-        }
-     };
-})
-
-.directive('nslArraySelectWatcher', ["$timeout", function ($timeout){
+.directive('nslSelectWatcher', ["$timeout", function ($timeout){
     return {
         restrict: 'A',
         require: 'ngModel',
         link: function(scope, element, attrs, ngModel) {
             // Load saved model values to multiselect input
             $timeout(function() {
-                $(element).select2().select2('val', ngModel.$modelValue);
+                if ($(element).attr('multiple') === 'multiple') {
+                    $(element).select2().select2('val', ngModel.$modelValue);
+                }
             }, 0);
+
+            // Watch
+            scope.$watch(function () {
+                return ngModel.$modelValue;
+            }, function(newValue) {
+                // Clear select value if the model has been removed
+                if (newValue === undefined) {
+                    $(element).select2().select2('val', null);
+                }
+            });
         }
      };
 }])

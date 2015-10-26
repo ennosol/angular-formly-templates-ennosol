@@ -1,1 +1,1 @@
-<select ts-select2="to.config" ng-model="model[options.key]" multiple="multiple" ng-options="key as value for (key, value) in to.options" nsl-select-watcher></select>
+<select ts-select2="to.config" ng-model="model[options.key]" multiple="multiple" ng-options="option.value for option in to.options track by option.key" nsl-select-watcher></select>

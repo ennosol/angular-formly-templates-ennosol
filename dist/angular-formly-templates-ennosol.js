@@ -82,10 +82,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/multiselect.html',
         wrapper: ['label', 'validation']
     }, {
-        name: 'arrayMultiSelect',
-        templateUrl: '/src/templates/array-multiselect.html',
-        wrapper: ['label', 'validation']
-    }, {
         name: 'repeatSection',
         templateUrl: '/src/templates/repeat-section.html',
         wrapper: [],
@@ -153,34 +149,27 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 }])
 
-.directive('nslSelectWatcher', function (){
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attrs, ngModel) {
-            scope.$watch(function () {
-                return ngModel.$modelValue;
-            }, function(newValue) {
-                if (newValue === undefined) {
-                    // Check if select2 has been initialized
-                    if ($(element).next().hasClass('select2')) {
-                        $(element).select2('val', null);
-                    }
-                }
-            });
-        }
-     };
-})
-
-.directive('nslArraySelectWatcher', ["$timeout", function ($timeout){
+.directive('nslSelectWatcher', ["$timeout", function ($timeout){
     return {
         restrict: 'A',
         require: 'ngModel',
         link: function(scope, element, attrs, ngModel) {
             // Load saved model values to multiselect input
             $timeout(function() {
-                $(element).select2().select2('val', ngModel.$modelValue);
+                if ($(element).attr('multiple') === 'multiple') {
+                    $(element).select2().select2('val', ngModel.$modelValue);
+                }
             }, 0);
+
+            // Watch
+            scope.$watch(function () {
+                return ngModel.$modelValue;
+            }, function(newValue) {
+                // Clear select value if the model has been removed
+                if (newValue === undefined) {
+                    $(element).select2().select2('val', null);
+                }
+            });
         }
      };
 }])
@@ -342,7 +331,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 }]);
 
 angular.module("formlyEnnosol").run(["$templateCache", function($templateCache) {$templateCache.put("/src/templates/addons.html","<div ng-class=\"{\'input-group\': to.addonLeft || to.addonRight}\"><div style=\"border:0\" class=\"input-group-addon {{to.addonLeft.bgClassName}}\" ng-if=\"to.addonLeft\" ng-style=\"{cursor: to.addonLeft.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonLeft.onClick(options, this)\"><i class=\"{{to.addonLeft.className}}\" ng-if=\"to.addonLeft.className\"></i> <span ng-if=\"to.addonLeft.text\">{{to.addonLeft.text}}</span></div><formly-transclude></formly-transclude><div style=\"border:0\" class=\"input-group-addon {{to.addonRight.bgClassName}}\" ng-if=\"to.addonRight\" ng-style=\"{cursor: to.addonRight.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonRight.onClick(options, this)\"><i class=\"{{to.addonRight.className}}\" ng-if=\"to.addonRight.className\"></i> <span ng-if=\"to.addonRight.text\">{{to.addonRight.text}}</span></div></div>");
-$templateCache.put("/src/templates/array-multiselect.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" multiple=\"multiple\" ng-options=\"option.value for option in to.options track by option.key\" nsl-select-watcher=\"\" nsl-array-select-watcher=\"\"></select>");
 $templateCache.put("/src/templates/checkbox.html","<div class=\"checkbox clip-check check-primary\"><input type=\"checkbox\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\"> <label for=\"{{id}}-chk\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label></div>");
 $templateCache.put("/src/templates/coordinate.html","<div class=\"input-group\"><input class=\"form-control text-center\" id=\"{{id}}_lat\" name=\"lat\" ng-model=\"model[options.key][\'lat\']\" placeholder=\"{{to.placeholder.lat}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;border:0;{{to.separator.style}}\" ng-click=\"to.separator.click(id)\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control text-center\" id=\"{{id}}_lng\" name=\"lng\" ng-model=\"model[options.key][\'lng\']\" placeholder=\"{{to.placeholder.lng}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\"></div>");
 $templateCache.put("/src/templates/date.html","<div class=\"form-group\"><input class=\"form-control show text-center nslFormlyDatepicker\" data-provide=\"{{to.readOnly || to.disabled ? \'\' : \'datepicker\'}}\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"text\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
@@ -351,7 +339,7 @@ $templateCache.put("/src/templates/error.html","<formly-transclude></formly-tran
 $templateCache.put("/src/templates/fieldset.html","<fieldset><legend>{{to.label}} {{to.required ? \'*\' : \'\'}}</legend><formly-transclude></formly-transclude></fieldset>");
 $templateCache.put("/src/templates/input.html","<div class=\"form-group\"><input class=\"form-control\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"{{to.disabled}}\" type=\"{{to.password ? \'password\' : (to.type ? to.type : \'text\')}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
 $templateCache.put("/src/templates/label.html","<div class=\"form-group\"><label for=\"{{id}}\" class=\"control-label\">{{to.label}} {{to.required ? \'*\' : \'\'}}</label><div><formly-transclude></formly-transclude></div><em id=\"{{id}}_description\" class=\"help-block\" ng-if=\"options.templateOptions.description\" style=\"opacity:0.6\">{{options.templateOptions.description}}</em></div>");
-$templateCache.put("/src/templates/multiselect.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" multiple=\"multiple\" ng-options=\"key as value for (key, value) in to.options\" nsl-select-watcher=\"\"></select>");
+$templateCache.put("/src/templates/multiselect.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" multiple=\"multiple\" ng-options=\"option.value for option in to.options track by option.key\" nsl-select-watcher=\"\"></select>");
 $templateCache.put("/src/templates/radio-inline.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio-inline\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
 $templateCache.put("/src/templates/radio.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio margin-right-20\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
 $templateCache.put("/src/templates/repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" ng-init=\"fields = copyFields(to.fields)\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtnClassName}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\">{{to.removeBtnText}}</button></div><hr></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
