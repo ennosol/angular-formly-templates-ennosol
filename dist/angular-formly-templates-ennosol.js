@@ -86,10 +86,15 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/repeat-section.html',
         wrapper: [],
         controller: 'RepeatSectionController'
+    }, {
+        name: 'sortableRepeatSection',
+        templateUrl: '/src/templates/sortable-repeat-section.html',
+        wrapper: [],
+        controller: 'RepeatSectionController'
     }]);
 }])
 
-.directive('nslTouchspin', function () {
+.directive('nslTouchspin', ['$timeout', function ($timeout) {
     return {
         restrict: 'A',
         scope: {
@@ -114,6 +119,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
             if (typeof scope.step === 'undefined' || scope.step === 0) {
                 scope.step = 1;
             }
+
             $(element).TouchSpin({
                 min: scope.min,
                 max: scope.max,
@@ -126,11 +132,20 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
                 postfix: scope.postfix || '',
                 verticalbuttons: scope.verticalButtons || false
             });
+
+            // Zero timeout for access the compiled template
+            $timeout(function() {
+                // Trigger input event for updating ng-model
+                $(element)
+                    .on('change', function() {
+                        element.trigger('input');
+                    });
+            }, 0);
         }
     };
-})
+}])
 
-.directive('nslFormlyDatepicker', ["$timeout", function($timeout) {
+.directive('nslFormlyDatepicker', ['$timeout', function($timeout) {
     return {
         restrict: 'C',
         link: function(scope, element) {
@@ -149,7 +164,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     };
 }])
 
-.directive('nslSelectWatcher', ["$timeout", function ($timeout){
+.directive('nslSelectWatcher', ['$timeout', function ($timeout){
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -174,46 +189,51 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
      };
 }])
 
-.controller('RepeatSectionController', ["$scope", function($scope) {
+.controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
     var unique = 1;
 
     $scope.formOptions = {formState: $scope.formState};
-        $scope.addNew = addNew;
-        $scope.copyFields = copyFields;
+    $scope.addNew = addNew;
+    $scope.copyFields = copyFields;
 
-        function copyFields(fields) {
-            fields = angular.copy(fields);
-            addRandomIds(fields);
-            return fields;
-        }
+    function copyFields(fields) {
+        fields = angular.copy(fields);
+        addRandomIds(fields);
+        return fields;
+    }
 
-        function addNew() {
-            $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
-            var repeatsection = $scope.model[$scope.options.key];
-            var lastSection = repeatsection[repeatsection.length - 1];
-            var newsection = {};
-            repeatsection.push(newsection);
-        }
+    function addNew() {
+        $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
+        var repeatsection = $scope.model[$scope.options.key];
+        var lastSection = repeatsection[repeatsection.length - 1];
+        var newsection = {open: true}; // open:true for the sortable-repeat-section template
+        repeatsection.push(newsection);
+    }
 
-        function addRandomIds(fields) {
-            unique++;
-            angular.forEach(fields, function(field, index) {
-                if (field.fieldGroup) {
-                    addRandomIds(field.fieldGroup);
-                    return; // fieldGroups don't need an ID
-                }
+    function addRandomIds(fields) {
+        unique++;
+        angular.forEach(fields, function(field, index) {
+            if (field.fieldGroup) {
+                addRandomIds(field.fieldGroup);
+                return; // fieldGroups don't need an ID
+            }
 
-                if (field.templateOptions && field.templateOptions.fields) {
-                    addRandomIds(field.templateOptions.fields);
-                }
+            if (field.templateOptions && field.templateOptions.fields) {
+                addRandomIds(field.templateOptions.fields);
+            }
 
-                field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
-            });
-        }
+            field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
+        });
+    }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min)) + min;
-        }
+    function getFieldValue(field) {
+        console.log('getFieldValue', $scope.model);
+        return $scope.model[field];
+    }
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
 }])
 
 .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
@@ -342,9 +362,10 @@ $templateCache.put("/src/templates/label.html","<div class=\"form-group\"><label
 $templateCache.put("/src/templates/multiselect.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" multiple=\"multiple\" ng-options=\"option.value for option in to.options track by option.key\" nsl-select-watcher=\"\"></select>");
 $templateCache.put("/src/templates/radio-inline.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio-inline\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
 $templateCache.put("/src/templates/radio.html","<div class=\"radio-group\"><div ng-repeat=\"(key, option) in to.options\" class=\"radio margin-right-20\"><label><input type=\"radio\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id + \'_\'+ $index}}\" tabindex=\"0\" ng-value=\"option[to.valueProp || \'id\']\" ng-model=\"model[options.key]\">{{option[to.labelProp || \'text\']}}</label></div></div>");
-$templateCache.put("/src/templates/repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" ng-init=\"fields = copyFields(to.fields)\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtnClassName}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\">{{to.removeBtnText}}</button></div><hr></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
+$templateCache.put("/src/templates/repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" ng-init=\"fields = copyFields(to.fields)\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtn.className}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\"><span class=\"{{to.removeBtn.spanClassName}}\">{{to.removeBtn.text}}</span></button></div></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
 $templateCache.put("/src/templates/search.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" data-text-field=\"to.textField\" data-text-fn=\"to.textFn\"></select>");
 $templateCache.put("/src/templates/select.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"key as value for (key, value) in to.options\" nsl-select-watcher=\"\"></select>");
+$templateCache.put("/src/templates/sortable-repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"sortable-container\" sv-root=\"\" sv-on-sort=\"\" sv-part=\"model[options.key]\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" sv-element=\"opts\" ng-init=\"fields = copyFields(to.fields)\"><div class=\"input-group sortable-element\"><div class=\"glyphicon glyphicon-move btn-primary bg-primary input-group-addon\" sv-handle=\"\"></div><div><div class=\"panel panel-default\"><div class=\"panel-heading clearfix\" ng-show=\"{{to.panel.header.show}}\"><h4 class=\"panel-title pull-left\" style=\"padding-top: 7.5px;\"><span ng-show=\"{{to.panel.header.orderNum}}\">{{$index + 1}}.</span></h4>{{$scope.getFieldValue(\'coords\')}} {{$scope.getFieldValue(\'coords.lng\')}} <button type=\"button\" ng-click=\"element.open = !element.open\" class=\"btn btn-link pull-right\"><span class=\"glyphicon icon\" ng-class=\"{\'glyphicon-chevron-up\':element.open,\'glyphicon-chevron-down\':!element.open}\"></span></button></div><div class=\"panel-body\" ng-show=\"element.open || {{!to.panel.header.show}}\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtn.className}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\"><span class=\"{{to.removeBtn.spanClassName}}\">{{to.removeBtn.text}}</span></button></div></div></div></div></div></div></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
 $templateCache.put("/src/templates/spinner.html","<div class=\"form-group\"><input nsl-touchspin=\"\" class=\"form-control text-center\" type=\"text\" ng-model=\"model[options.key]\" data-min=\"to.data.min\" data-max=\"to.data.max\" data-step=\"to.data.step\" data-stepinterval=\"to.data.stepInterval\" data-decimals=\"to.data.decimals\" data-boost-at=\"to.data.boostAt\" data-max-boosted-step=\"to.data.maxBoostedStep\" data-prefix=\"to.data.prefix\" data-postfix=\"to.data.postfix\" data-vertical-buttoms=\"to.data.verticalButtons\"></div>");
 $templateCache.put("/src/templates/static.html","<div class=\"form-group\"><p class=\"form-control-static\">{{model[options.key]}}</p></div>");
 $templateCache.put("/src/templates/switch.html","<input type=\"checkbox\" class=\"js-switch\" ui-switch=\"\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\">");
