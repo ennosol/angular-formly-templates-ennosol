@@ -189,7 +189,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
      };
 }])
 
-.controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
+.controller('RepeatSectionController', ['$scope', '$timeout', '$compile', function($scope, $timeout, $compile) {
     var unique = 1;
 
     $scope.formOptions = {formState: $scope.formState};
@@ -228,6 +228,39 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    //$scope.panelHeader
+    $scope.getPanelHeader = function(idx) {
+        var params = [];
+        angular.forEach($scope.options.templateOptions.panel.header.captionFields, function(field, index) {
+            if (typeof getValueByDottedKey($scope.model[$scope.options.key][idx], field) !== 'undefined')  {
+                params.push(getValueByDottedKey($scope.model[$scope.options.key][idx], field));
+            }
+        });
+
+        try {
+            var caption = vsprintf($scope.options.templateOptions.panel.header.captionFormat, params);
+        } catch(err) {
+            caption = '';
+        } finally {
+            return caption;
+        }
+    }
+
+    function getValueByDottedKey(o, s) {
+        s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+        s = s.replace(/^\./, '');           // strip a leading dot
+        var a = s.split('.');
+        for (var i = 0, n = a.length; i < n; ++i) {
+            var k = a[i];
+            if (k in o) {
+                o = o[k];
+            } else {
+                return;
+            }
+        }
+        return o;
     }
 }])
 

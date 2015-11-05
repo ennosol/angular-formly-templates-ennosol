@@ -189,7 +189,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
      };
 }])
 
-.controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
+.controller('RepeatSectionController', ['$scope', '$timeout', '$compile', function($scope, $timeout, $compile) {
     var unique = 1;
 
     $scope.formOptions = {formState: $scope.formState};
@@ -226,13 +226,41 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         });
     }
 
-    function getFieldValue(field) {
-        console.log('getFieldValue', $scope.model);
-        return $scope.model[field];
-    }
-
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    //$scope.panelHeader
+    $scope.getPanelHeader = function(idx) {
+        var params = [];
+        angular.forEach($scope.options.templateOptions.panel.header.captionFields, function(field, index) {
+            if (typeof getValueByDottedKey($scope.model[$scope.options.key][idx], field) !== 'undefined')  {
+                params.push(getValueByDottedKey($scope.model[$scope.options.key][idx], field));
+            }
+        });
+
+        try {
+            var caption = vsprintf($scope.options.templateOptions.panel.header.captionFormat, params);
+        } catch(err) {
+            caption = '';
+        } finally {
+            return caption;
+        }
+    }
+
+    function getValueByDottedKey(o, s) {
+        s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+        s = s.replace(/^\./, '');           // strip a leading dot
+        var a = s.split('.');
+        for (var i = 0, n = a.length; i < n; ++i) {
+            var k = a[i];
+            if (k in o) {
+                o = o[k];
+            } else {
+                return;
+            }
+        }
+        return o;
     }
 }])
 
@@ -365,7 +393,7 @@ $templateCache.put("/src/templates/radio.html","<div class=\"radio-group\"><div 
 $templateCache.put("/src/templates/repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" ng-init=\"fields = copyFields(to.fields)\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtn.className}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\"><span class=\"{{to.removeBtn.spanClassName}}\">{{to.removeBtn.text}}</span></button></div></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
 $templateCache.put("/src/templates/search.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" data-text-field=\"to.textField\" data-text-fn=\"to.textFn\"></select>");
 $templateCache.put("/src/templates/select.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"key as value for (key, value) in to.options\" nsl-select-watcher=\"\"></select>");
-$templateCache.put("/src/templates/sortable-repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"sortable-container\" sv-root=\"\" sv-on-sort=\"\" sv-part=\"model[options.key]\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" sv-element=\"opts\" ng-init=\"fields = copyFields(to.fields)\"><div class=\"input-group sortable-element\"><div class=\"glyphicon glyphicon-move btn-primary bg-primary input-group-addon\" sv-handle=\"\"></div><div><div class=\"panel panel-default\"><div class=\"panel-heading clearfix\" ng-show=\"{{to.panel.header.show}}\"><h4 class=\"panel-title pull-left\" style=\"padding-top: 7.5px;\"><span ng-show=\"{{to.panel.header.orderNum}}\">{{$index + 1}}.</span></h4>{{$scope.getFieldValue(\'coords\')}} {{$scope.getFieldValue(\'coords.lng\')}} <button type=\"button\" ng-click=\"element.open = !element.open\" class=\"btn btn-link pull-right\"><span class=\"glyphicon icon\" ng-class=\"{\'glyphicon-chevron-up\':element.open,\'glyphicon-chevron-down\':!element.open}\"></span></button></div><div class=\"panel-body\" ng-show=\"element.open || {{!to.panel.header.show}}\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtn.className}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\"><span class=\"{{to.removeBtn.spanClassName}}\">{{to.removeBtn.text}}</span></button></div></div></div></div></div></div></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
+$templateCache.put("/src/templates/sortable-repeat-section.html","<div><fieldset><legend>{{to.label}}</legend><div class=\"{{hideRepeat}}\"><div class=\"sortable-container\" sv-root=\"\" sv-on-sort=\"\" sv-part=\"model[options.key]\"><div class=\"repeatsection\" ng-repeat=\"element in model[options.key]\" sv-element=\"opts\" ng-init=\"fields = copyFields(to.fields)\"><div class=\"input-group sortable-element\"><div class=\"btn-primary bg-primary input-group-addon\" sv-handle=\"\">{{$index + 1}}.</div><div><div class=\"panel panel-default\"><div class=\"panel-heading clearfix\" ng-show=\"{{to.panel.header.show}}\"><h4 class=\"panel-title pull-left\" style=\"padding-top: 7.5px;\"><span ng-show=\"{{to.panel.header.orderNum}}\" ng-bind-html=\"getPanelHeader($index)\"></span></h4><button type=\"button\" ng-click=\"element.open = !element.open\" class=\"btn btn-link pull-right\"><span class=\"glyphicon icon\" ng-class=\"{\'glyphicon-chevron-up\':element.open,\'glyphicon-chevron-down\':!element.open}\"></span></button></div><div class=\"panel-body\" ng-show=\"element.open || {{!to.panel.header.show}}\"><formly-form fields=\"fields\" model=\"element\" form=\"form\"></formly-form><div style=\"margin-bottom:20px;\" class=\"{{to.removeBtn.className}}\"><button type=\"button\" class=\"btn btn-danger\" ng-click=\"model[options.key].splice($index, 1)\"><span class=\"{{to.removeBtn.spanClassName}}\">{{to.removeBtn.text}}</span></button></div></div></div></div></div></div></div><p class=\"AddNewButton\"><button type=\"button\" class=\"btn btn-primary\" ng-click=\"addNew()\">{{to.addBtnText}}</button></p></div></fieldset></div>");
 $templateCache.put("/src/templates/spinner.html","<div class=\"form-group\"><input nsl-touchspin=\"\" class=\"form-control text-center\" type=\"text\" ng-model=\"model[options.key]\" data-min=\"to.data.min\" data-max=\"to.data.max\" data-step=\"to.data.step\" data-stepinterval=\"to.data.stepInterval\" data-decimals=\"to.data.decimals\" data-boost-at=\"to.data.boostAt\" data-max-boosted-step=\"to.data.maxBoostedStep\" data-prefix=\"to.data.prefix\" data-postfix=\"to.data.postfix\" data-vertical-buttoms=\"to.data.verticalButtons\"></div>");
 $templateCache.put("/src/templates/static.html","<div class=\"form-group\"><p class=\"form-control-static\">{{model[options.key]}}</p></div>");
 $templateCache.put("/src/templates/switch.html","<input type=\"checkbox\" class=\"js-switch\" ui-switch=\"\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\">");
