@@ -189,7 +189,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
      };
 }])
 
-.controller('RepeatSectionController', ['$scope', '$timeout', '$compile', function($scope, $timeout, $compile) {
+.controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
     var unique = 1;
 
     $scope.formOptions = {formState: $scope.formState};
