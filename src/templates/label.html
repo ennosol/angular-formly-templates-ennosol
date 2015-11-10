@@ -1,6 +1,6 @@
 <div class="form-group">
     <label for="{{id}}" class="control-label">
-        {{to.label}}
+        <span ng-bind-html="to.label"></span>
         {{to.required ? '*' : ''}}
     </label>
     <div>

@@ -18,7 +18,7 @@
                                 <div class="panel-body" ng-show="element.open || {{!to.panel.header.show}}">
                                     <formly-form fields="fields" model="element" form="form"></formly-form>
                                     <div style="margin-bottom:20px;" class="{{to.removeBtn.className}}">
-                                        <button type="button" class="btn btn-danger" ng-click="model[options.key].splice($index, 1)">
+                                        <button type="button" class="btn btn-danger" ng-click="removeItem($index)">
                                             <span class="{{to.removeBtn.spanClassName}}"> {{to.removeBtn.text}} </span>
                                         </button>
                                     </div>

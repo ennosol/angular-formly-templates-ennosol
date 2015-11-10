@@ -210,6 +210,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         repeatsection.push(newsection);
     }
 
+    function removeItem(idx) {
+        model[options.key].splice(idx, 1);
+    }
+
     function addRandomIds(fields) {
         unique++;
         angular.forEach(fields, function(field, index) {
