@@ -194,6 +194,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
 
     $scope.formOptions = {formState: $scope.formState};
     $scope.addNew = addNew;
+    $scope.removeItem = removeItem;
     $scope.copyFields = copyFields;
 
     function copyFields(fields) {
@@ -211,7 +212,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
     }
 
     function removeItem(idx) {
-        model[options.key].splice(idx, 1);
+        $scope.model[$scope.options.key].splice(idx, 1);
     }
 
     function addRandomIds(fields) {
