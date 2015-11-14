@@ -46,6 +46,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/date.html',
         wrapper: ['addons', 'label', 'validation']
     }, {
+        name: 'time',
+        templateUrl: '/src/templates/time.html',
+        wrapper: ['addons', 'label', 'validation']
+    }, {
         name: 'daterange',
         templateUrl: '/src/templates/daterange.html',
         wrapper: ['addons', 'label', 'validation']
@@ -159,6 +163,24 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
                     .on('changeDate', function() {
                         element.trigger('input');
                     });
+            }, 0);
+        }
+    };
+}])
+
+.directive('nslFormlyTimepicker', ['$timeout', function($timeout) {
+    return {
+        restrict: 'C',
+        link: function(scope, element) {
+            // Zero timeout for access the compiled template
+            $timeout(function() {
+                // Cut off UTC info
+                $(element).clockpicker({
+                    placement: 'bottom',
+                    align: 'left',
+                    autoclose: true,
+                    'default': 'now'
+                });
             }, 0);
         }
     };

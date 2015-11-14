@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="../bower_components/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="../bower_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css">
+    <link rel="stylesheet" href="../bower_components/clockpicker/dist/bootstrap-clockpicker.min.css">
+
     <style>
         .datepicker {
             display: block !important;
@@ -62,8 +64,10 @@
 
     <link rel="stylesheet" href="./app.css">
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/api-check/7.5.0/api-check.min.js"></script>
@@ -73,6 +77,12 @@
     <script type="text/javascript" src="../bower_components/ng-switchery/src/ng-switchery.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
+
+
+
+    <script type="text/javascript" src="../bower_components/clockpicker/dist/bootstrap-clockpicker.min.js"></script>
+
+
     <script type="text/javascript" src="../bower_components/select2/dist/js/select2.full.min.js"></script>
     <script type="text/javascript" src="../bower_components/select2/dist/js/i18n/hu.js"></script>
     <script type="text/javascript" src="../bower_components/angular-ts-select2/ts-select2.js"></script>
@@ -83,6 +93,39 @@
 <body class="container">
 
     <h1>hello</h1>
+
+    <div class="input-group clockpicker col-md-1">
+        <input type="text" class="form-control" value="09:30">
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span>
+        </span>
+    </div>
+<!--
+    <div class="clearfix">
+            <div class="pull-center clearfix" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-default pull-right" id="check-minutes">Check the minutes</button>
+                <input class="form-control pull-right" id="single-input" value="" placeholder="Now" style="width:80px;margin-right:20px;">
+            </div>
+        </div>
+    <script type="text/javascript">
+            $('.clockpicker').clockpicker();
+
+
+            var input = $('#single-input').clockpicker({
+    placement: 'bottom',
+    align: 'left',
+    autoclose: true,
+    'default': 'now'
+});
+        // Manually toggle to the minutes view
+        $('#check-minutes').click(function(e){
+            // Have to stop propagation here
+            e.stopPropagation();
+            input.clockpicker('show')
+                    .clockpicker('toggleView', 'minutes');
+        });
+    </script>
+-->
 
     <div ng-app="myApp" ng-controller="myCtrl as vm">
         <h4>Model:</h4>
@@ -357,6 +400,21 @@
                     }
                 },
                 {
+                    key: 'seltime',
+                    type: 'time',
+                    className: 'col-sm-2',
+                    defaultValue: '12:34',
+                    templateOptions: {
+                        label: 'Created on:',
+                        datepicker: {
+                            language: 'hu',
+                            weekStart: 1,
+                            format: 'HH:mm'
+                        }
+                    }
+                },
+                {
+
                     key: 'range',
                     type: 'daterange',
                     className: 'col-sm-5',

@@ -46,6 +46,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/date.html',
         wrapper: ['addons', 'label', 'validation']
     }, {
+        name: 'time',
+        templateUrl: '/src/templates/time.html',
+        wrapper: ['addons', 'label', 'validation']
+    }, {
         name: 'daterange',
         templateUrl: '/src/templates/daterange.html',
         wrapper: ['addons', 'label', 'validation']
@@ -159,6 +163,24 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
                     .on('changeDate', function() {
                         element.trigger('input');
                     });
+            }, 0);
+        }
+    };
+}])
+
+.directive('nslFormlyTimepicker', ['$timeout', function($timeout) {
+    return {
+        restrict: 'C',
+        link: function(scope, element) {
+            // Zero timeout for access the compiled template
+            $timeout(function() {
+                // Cut off UTC info
+                $(element).clockpicker({
+                    placement: 'bottom',
+                    align: 'left',
+                    autoclose: true,
+                    'default': 'now'
+                });
             }, 0);
         }
     };
@@ -403,4 +425,5 @@ $templateCache.put("/src/templates/spinner.html","<div class=\"form-group\"><inp
 $templateCache.put("/src/templates/static.html","<div class=\"form-group\"><p class=\"form-control-static\">{{model[options.key]}}</p></div>");
 $templateCache.put("/src/templates/switch.html","<input type=\"checkbox\" class=\"js-switch\" ui-switch=\"\" ng-disabled=\"{{to.readOnly || to.disabled}}\" id=\"{{id}}-chk\" ng-model=\"model[options.key]\">");
 $templateCache.put("/src/templates/tags.html","<select ts-select2=\"to.config\" ng-model=\"model[options.key]\" ng-options=\"option for option in to.options track by option\" data-tags=\"true\" multiple=\"multiple\"></select>");
-$templateCache.put("/src/templates/textarea.html","<textarea class=\"form-control\" rows=\"{{options.templateOptions.rows? options.templateOptions.rows: \'5\'}}\" placeholder=\"{{options.templateOptions.placeholder}}\" ng-model=\"model[options.key]\"></textarea>");}]);
+$templateCache.put("/src/templates/textarea.html","<textarea class=\"form-control\" rows=\"{{options.templateOptions.rows? options.templateOptions.rows: \'5\'}}\" placeholder=\"{{options.templateOptions.placeholder}}\" ng-model=\"model[options.key]\"></textarea>");
+$templateCache.put("/src/templates/time.html","<div class=\"form-group\"><div class=\"input-group clockpicker nslFormlyTimepicker\"><input type=\"text\" class=\"form-control\" value=\"08:00\" ng-model=\"model[options.key]\" ng-disabled=\"{{to.disabled}}\"> <span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-time\"></span></span></div></div>");}]);

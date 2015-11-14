@@ -31,6 +31,7 @@
     "bootstrap-datepicker": "~1.4.0",
     "select2": "~4.0.0",
     "angular-ts-select2": "git+https://github.com/ennosol/angular-ts-select2.git#master",
+    "clockpicker": "git+https://github.com/weareoutman/clockpicker.git#~0.0.7",
     "bootstrap-touchspin": "~3.0.1"
   },
   "devDependencies": {
