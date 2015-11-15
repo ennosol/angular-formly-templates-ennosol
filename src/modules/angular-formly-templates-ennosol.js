@@ -98,7 +98,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
     }, {
         name: 'cron',
         templateUrl: '/src/templates/cron.html',
-        wrapper: []
+        wrapper: ['label']
     }]);
 }])
 
