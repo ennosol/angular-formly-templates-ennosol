@@ -45,6 +45,12 @@
         "dist/js/select2.full.js",
         "dist/css/select2.css"
       ]
+    },
+    "angular-cron-jobs": {
+      "main": [
+        "dist/angular-cron-jobs.min.js",
+        "dist/angular-cron-jobs.min.css"
+      ]
     }
   },
   "resolutions": {
