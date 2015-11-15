@@ -1,4 +1,4 @@
-angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formlyConfigProvider', function configFormlyEnnosol(formlyConfigProvider) {
+angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-cron-jobs'], ['formlyConfigProvider', function configFormlyEnnosol(formlyConfigProvider) {
     'use strict';
 
     // WRAPPERS
@@ -95,6 +95,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         templateUrl: '/src/templates/sortable-repeat-section.html',
         wrapper: [],
         controller: 'RepeatSectionController'
+    }, {
+        name: 'cron',
+        templateUrl: '/src/templates/cron.html',
+        wrapper: []
     }]);
 }])
 
@@ -185,6 +189,18 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2'], ['formly
         }
     };
 }])
+
+.directive('nslFormlyCron', function() {
+    return {
+        restrict: 'C',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            scope.$watch('cronOutput', function() {
+               ngModel.$setViewValue(scope.cronOutput);
+            });
+        }
+    };
+})
 
 .directive('nslSelectWatcher', ['$timeout', function ($timeout){
     return {
