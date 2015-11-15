@@ -185,6 +185,12 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
                     autoclose: true,
                     'default': 'now'
                 });
+
+                // Trigger input event for updating ng-model
+                $(element).clockpicker()
+                    .on('change', function() {
+                        element.find('input').trigger('input');
+                    });
             }, 0);
         }
     };
