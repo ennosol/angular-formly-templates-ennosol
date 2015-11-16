@@ -98,7 +98,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
     }, {
         name: 'cron',
         templateUrl: '/src/templates/cron.html',
-        wrapper: []
+        wrapper: ['label']
     }]);
 }])
 
@@ -155,15 +155,23 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
 
 .directive('nslFormlyDatepicker', ['$timeout', function($timeout) {
     return {
-        restrict: 'C',
+        restrict: 'CA',
+        scope: {
+            datePickerOptions: '='
+        },
         link: function(scope, element) {
+            // Extend the default options with the user defined options
+            var options = angular.extend({
+                autoclose: true
+            }, scope.datePickerOptions);
+
             // Zero timeout for access the compiled template
             $timeout(function() {
                 // Cut off UTC info
                 $(element).val($(element).val().substring(0, 10));
 
                 // Trigger input event for updating ng-model
-                $(element).datepicker()
+                $(element).datepicker(options)
                     .on('changeDate', function() {
                         element.trigger('input');
                     });
@@ -185,6 +193,12 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
                     autoclose: true,
                     'default': 'now'
                 });
+
+                // Trigger input event for updating ng-model
+                $(element).clockpicker()
+                    .on('change', function() {
+                        element.find('input').trigger('input');
+                    });
             }, 0);
         }
     };
