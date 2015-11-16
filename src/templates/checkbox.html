@@ -1,4 +1,4 @@
-<div class="checkbox clip-check check-primary">
+<div class="checkbox clip-check check-primary" ng-hide="to.hide">
     <input type="checkbox" ng-disabled="to.readOnly || to.disabled" id="{{id}}-chk" ng-model="model[options.key]">
     <label for="{{id}}-chk">{{to.label}} {{to.required ? '*' : ''}}</label>
 </div>

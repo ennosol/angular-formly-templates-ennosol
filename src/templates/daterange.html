@@ -1,4 +1,4 @@
-<div class="form-group">
+<div class="form-group" ng-hide="to.hide" >
     <div class="input-daterange input-group" data-provide="datepicker" data-date-format="{{to.datepicker.format || 'yyyy-mm-dd'}}" data-date-language="{{to.datepicker.language}}" data-date-weekstart="{{to.datepicker.weekStart}}">
         <input class="form-control show nslFormlyDatepicker" name="start" ng-model="model[options.key]['start']" placeholder="{{to.placeholder.start}}" ng-readonly="{{to.readOnly}}" ng-disabled="to.disabled" type="text">
         <span class="input-group-addon {{to.separator.bgClassName}}" style="min-width:38px;min-height:34px;border:0;">

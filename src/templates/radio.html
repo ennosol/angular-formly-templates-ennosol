@@ -1,4 +1,4 @@
-<div class="radio-group">
+<div class="radio-group" ng-hide="to.hide">
     <div ng-repeat="(key, option) in to.options" class="radio margin-right-20">
         <label>
             <input type="radio" ng-disabled="to.readOnly || to.disabled" id="{{id + '_'+ $index}}" tabindex="0" ng-value="option[to.valueProp || 'id']"

@@ -1,4 +1,4 @@
-<div class="input-group">
+<div class="input-group" ng-hide="to.hide" >
     <input class="form-control text-center" id="{{id}}_lat" name="lat" ng-model="model[options.key]['lat']" placeholder="{{to.placeholder.lat}}" ng-readonly="{{to.readOnly}}" ng-disabled="to.disabled" type="text">
     <span class="input-group-addon {{to.separator.bgClassName}}" style="min-width:38px;min-height:34px;border:0;{{to.separator.style}}" ng-click="to.separator.click(id)">
         <i class="{{to.separator.className}}" ng-if="to.separator.className"></i>
