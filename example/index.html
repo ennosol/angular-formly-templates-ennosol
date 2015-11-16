@@ -137,7 +137,7 @@
             };
 
             vm.fields = [
-                /*
+
                 {
                     key: 'username',
                     type: 'static',
@@ -166,7 +166,7 @@
                             className: 'glyphicon glyphicon-remove text-danger'
                         }
                     }
-                },*/
+                },
                 {
                     key: 'cronjob',
                     type: 'cron',
@@ -180,7 +180,7 @@
                 {
                     template: '<hr class="clearfix">'
                 },
-                /*
+
                 {
                     key: 'name',
                     type: 'nested',
@@ -685,7 +685,8 @@
                                 expressionProperties: {
                                     'templateOptions.disabled': '!model.stockIdentifier'
                                 }
-                            },
+                            }
+                            ,
                             {
                                 type: 'checkbox',
                                 model: 'formState',
@@ -733,7 +734,7 @@
                             }
                         ]
                     }
-                }*/
+                }
             ];
 
             vm.onSubmit = function() {

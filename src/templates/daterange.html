@@ -1,10 +1,10 @@
 <div class="form-group">
     <div class="input-daterange input-group" data-provide="datepicker" data-date-format="{{to.datepicker.format || 'yyyy-mm-dd'}}" data-date-language="{{to.datepicker.language}}" data-date-weekstart="{{to.datepicker.weekStart}}">
-        <input class="form-control show nslFormlyDatepicker" name="start" ng-model="model[options.key]['start']" placeholder="{{to.placeholder.start}}" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}" type="text">
+        <input class="form-control show nslFormlyDatepicker" name="start" ng-model="model[options.key]['start']" placeholder="{{to.placeholder.start}}" ng-readonly="{{to.readOnly}}" ng-disabled="to.disabled" type="text">
         <span class="input-group-addon {{to.separator.bgClassName}}" style="min-width:38px;min-height:34px;border:0;">
             <i class="{{to.separator.className}}" ng-if="to.separator.className"></i>
             <span ng-if="to.separator.text">{{to.separator.text}}</span>
         </span>
-        <input class="form-control show nslFormlyDatepicker" name="end" ng-model="model[options.key]['end']" placeholder="{{to.placeholder.end}}" ng-readonly="{{to.readOnly}}" ng-disabled="{{to.disabled}}" type="text">
+        <input class="form-control show nslFormlyDatepicker" name="end" ng-model="model[options.key]['end']" placeholder="{{to.placeholder.end}}" ng-readonly="{{to.readOnly}}" ng-disabled="to.disabled" type="text">
     </div>
 </div>
