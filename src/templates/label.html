@@ -1,5 +1,5 @@
 <div class="form-group" ng-hide="to.hide">
-    <label for="{{id}}" class="control-label">
+    <label for="{{id}}" class="control-label" ng-show="to.label">
         <span ng-bind-html="to.label"></span>
         {{to.required ? '*' : ''}}
     </label>
