@@ -216,31 +216,6 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
     };
 })
 
-.directive('nslSelectWatcher', ['$timeout', function ($timeout){
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attrs, ngModel) {
-            // Load saved model values to multiselect input
-            $timeout(function() {
-                if ($(element).attr('multiple') === 'multiple') {
-                    $(element).select2().select2('val', ngModel.$modelValue);
-                }
-            }, 0);
-
-            // Watch
-            scope.$watch(function () {
-                return ngModel.$modelValue;
-            }, function(newValue) {
-                // Clear select value if the model has been removed
-                if (newValue === undefined) {
-                    $(element).select2().select2('val', null);
-                }
-            });
-        }
-     };
-}])
-
 .controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
     var unique = 1;
 

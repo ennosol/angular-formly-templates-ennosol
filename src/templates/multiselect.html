@@ -1,1 +1,3 @@
-<select ts-select2="to.config" ng-model="model[options.key]" multiple="multiple" ng-options="option.value for option in to.options track by option.key" ng-hide="to.hide" nsl-select-watcher></select>
+<div ng-hide="to.hide">
+    <select ts-select2="to.config" ng-model="model[options.key]" multiple="multiple" ng-options="option.value for option in to.options track by option.key"></select>
+</div>
