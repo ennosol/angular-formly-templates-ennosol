@@ -22,6 +22,9 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
         wrapper: ['fieldset'],
         template: '<formly-form model="model[options.key]" fields="options.data.fields"></formly-form>'
     }, {
+        name: 'button',
+        templateUrl: '/src/templates/button.html'
+    }, {
         name: 'checkbox',
         templateUrl: '/src/templates/checkbox.html',
         wrapper: ['validation']
