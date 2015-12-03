@@ -7,7 +7,7 @@
                 <formly-form fields="fields" model="element" form="form"></formly-form>
 
                 <div style="margin-bottom:20px;" class="{{to.removeBtn.className}}">
-                    <button type="button" class="btn btn-danger" ng-click="removeItem($index)">
+                    <button type="button" title="{{to.removeBtn.title}}" class="btn btn-danger btn-o" ng-click="removeItem($index)">
                         <span class="{{to.removeBtn.spanClassName}}">
                             {{to.removeBtn.text}}
                         </span>
@@ -16,8 +16,8 @@
                 <hr>
             </div>
 
-            <p class="AddNewButton">
-                <button type="button" class="btn btn-primary" ng-click="addNew()" >{{to.addBtnText}}</button>
+            <p>
+                <button ng-repeat="button in to.buttons" type="button" ng-class="button.className" ng-click="button.click($event)" ng-bind-html="button.text" title="{{button.title}}" class="btn"></button>
             </p>
         </div>
     </fieldset>
