@@ -1,4 +1,6 @@
-    <formly-transclude></formly-transclude>
-        <div ng-messages="fc.$error" ng-if="options.validation.errorExistsAndShouldBeVisible" class="error-messages">
-        <div ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="message">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div>
+<formly-transclude></formly-transclude>
+    <div ng-messages="fc.$error" ng-if="options.validation.errorExistsAndShouldBeVisible" class="error-messages">
+        <div ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="message">
+            {{ message(fc.$viewValue, fc.$modelValue, this)}}
+        </div>
     </div>

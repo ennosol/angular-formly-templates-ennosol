@@ -226,6 +226,8 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
     $scope.addNew = addNew;
     $scope.removeItem = removeItem;
     $scope.copyFields = copyFields;
+    $scope.getPanelHeader = getPanelHeader;
+    $scope.getSelectValue = getSelectValue;
 
     function copyFields(fields) {
         fields = angular.copy(fields);
@@ -265,12 +267,25 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
-    //$scope.panelHeader
-    $scope.getPanelHeader = function(idx) {
+    function getPanelHeader(idx) {
         var params = [];
+        var dottedValue;
+
+        //console.log('$scope.options.templateOptions', $scope.options.templateOptions);
         angular.forEach($scope.options.templateOptions.panel.header.captionFields, function(field, index) {
-            if (typeof getValueByDottedKey($scope.model[$scope.options.key][idx], field) !== 'undefined')  {
-                params.push(getValueByDottedKey($scope.model[$scope.options.key][idx], field));
+            // Call custom function
+            if (field.substr(0, 1) === '@') {
+                // Replace variables
+                field = field.replace("$idx", idx);
+
+                // Call function
+                params.push($scope.$eval(field.substr(1)));
+            // Get model value by dot-format key
+            } else {
+                dottedValue = getValueByDottedKey($scope.model[$scope.options.key][idx], field);
+                if (typeof dottedValue !== 'undefined') {
+                    params.push(dottedValue);
+                }
             }
         });
 
@@ -283,18 +298,29 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
         }
     }
 
+    function getSelectValue(fieldIdx, idx) {
+        var options = $scope.options.templateOptions.fields[fieldIdx].templateOptions.options;
+        var keyName = $scope.options.templateOptions.fields[fieldIdx].key;
+        var keyValue = getValueByDottedKey($scope.model[$scope.options.key][idx], keyName);
+
+        return options[keyValue] || '';
+    }
+
     function getValueByDottedKey(o, s) {
-        s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-        s = s.replace(/^\./, '');           // strip a leading dot
-        var a = s.split('.');
-        for (var i = 0, n = a.length; i < n; ++i) {
-            var k = a[i];
-            if (k in o) {
-                o = o[k];
-            } else {
-                return;
+        if (typeof s !== 'undefined') {
+            s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+            s = s.replace(/^\./, '');           // strip a leading dot
+            var a = s.split('.');
+            for (var i = 0, n = a.length; i < n; ++i) {
+                var k = a[i];
+                if (k in o) {
+                    o = o[k];
+                } else {
+                    return;
+                }
             }
         }
+
         return o;
     }
 }])
