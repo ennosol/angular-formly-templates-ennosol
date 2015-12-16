@@ -103,341 +103,363 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
         templateUrl: '/src/templates/cron.html',
         wrapper: ['label']
     }]);
-}])
-
-.directive('nslTouchspin', ['$timeout', function ($timeout) {
-    return {
-        restrict: 'A',
-        scope: {
-            min: '=',
-            max: '=',
-            step: '=',
-            stepInterval: '=',
-            decimals: '=',
-            boostAt: '=',
-            maxBoostedStep: '=',
-            prefix: '=',
-            postfix: '=',
-            verticalButtons: '='
-        },
-        link: function(scope, element, attrs) {
-            if (typeof scope.min === 'undefined') {
-                scope.min = Number.MIN_SAFE_INTEGER || -Number.MAX_VALUE;
-            }
-            if (typeof scope.max === 'undefined') {
-                scope.max = Number.MAX_SAFE_INTEGER || Number.MAX_VALUE;
-            }
-            if (typeof scope.step === 'undefined' || scope.step === 0) {
-                scope.step = 1;
-            }
-
-            $(element).TouchSpin({
-                min: scope.min,
-                max: scope.max,
-                step: scope.step,
-                stepinterval: scope.stepInterval || 50,
-                decimals: scope.decimals || 0,
-                boostat: scope.boostAt || 5,
-                maxboostedstep: scope.maxBoostedStep || 10,
-                prefix: scope.prefix || '',
-                postfix: scope.postfix || '',
-                verticalbuttons: scope.verticalButtons || false
-            });
-
-            // Zero timeout for access the compiled template
-            $timeout(function() {
-                // Trigger input event for updating ng-model
-                $(element)
-                    .on('change', function() {
-                        element.trigger('input');
-                    });
-            }, 0);
-        }
-    };
-}])
-
-.directive('nslFormlyDatepicker', ['$timeout', function($timeout) {
-    return {
-        restrict: 'CA',
-        scope: {
-            datePickerOptions: '='
-        },
-        link: function(scope, element) {
-            // Extend the default options with the user defined options
-            var options = angular.extend({
-                autoclose: true
-            }, scope.datePickerOptions);
-
-            // Zero timeout for access the compiled template
-            $timeout(function() {
-                // Cut off UTC info
-                $(element).val($(element).val().substring(0, 10));
-
-                // Trigger input event for updating ng-model
-                $(element).datepicker(options)
-                    .on('changeDate', function() {
-                        element.trigger('input');
-                    });
-            }, 0);
-        }
-    };
-}])
-
-.directive('nslFormlyTimepicker', ['$timeout', function($timeout) {
-    return {
-        restrict: 'C',
-        link: function(scope, element) {
-            // Zero timeout for access the compiled template
-            $timeout(function() {
-                // Cut off UTC info
-                $(element).clockpicker({
-                    placement: 'bottom',
-                    align: 'left',
-                    autoclose: true,
-                    'default': 'now'
-                });
-
-                // Trigger input event for updating ng-model
-                $(element).clockpicker()
-                    .on('change', function() {
-                        element.find('input').trigger('input');
-                    });
-            }, 0);
-        }
-    };
-}])
-
-.directive('nslFormlyCron', function() {
-    return {
-        restrict: 'C',
-        require: 'ngModel',
-        link: function(scope, element, attrs, ngModel) {
-            scope.$watch('cronOutput', function() {
-               ngModel.$setViewValue(scope.cronOutput);
-            });
-        }
-    };
-})
-
-.controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
-    var unique = 1;
-
-    $scope.formOptions = {formState: $scope.formState};
-    $scope.addNew = addNew;
-    $scope.removeItem = removeItem;
-    $scope.copyFields = copyFields;
-    $scope.getPanelHeader = getPanelHeader;
-    $scope.getSelectValue = getSelectValue;
-
-    function copyFields(fields) {
-        fields = angular.copy(fields);
-        addRandomIds(fields);
-        return fields;
-    }
-
-    function addNew() {
-        $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
-        var repeatsection = $scope.model[$scope.options.key];
-        var lastSection = repeatsection[repeatsection.length - 1];
-        var newsection = {open: true}; // open:true for the sortable-repeat-section template
-        repeatsection.push(newsection);
-    }
-
-    function removeItem(idx) {
-        $scope.model[$scope.options.key].splice(idx, 1);
-    }
-
-    function addRandomIds(fields) {
-        unique++;
-        angular.forEach(fields, function(field, index) {
-            if (field.fieldGroup) {
-                addRandomIds(field.fieldGroup);
-                return; // fieldGroups don't need an ID
-            }
-
-            if (field.templateOptions && field.templateOptions.fields) {
-                addRandomIds(field.templateOptions.fields);
-            }
-
-            field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
-        });
-    }
-
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
-    function getPanelHeader(idx) {
-        var params = [];
-        var dottedValue;
-
-        //console.log('$scope.options.templateOptions', $scope.options.templateOptions);
-        angular.forEach($scope.options.templateOptions.panel.header.captionFields, function(field, index) {
-            // Call custom function
-            if (field.substr(0, 1) === '@') {
-                // Replace variables
-                field = field.replace("$idx", idx);
-
-                // Call function
-                params.push($scope.$eval(field.substr(1)));
-            // Get model value by dot-format key
-            } else {
-                dottedValue = getValueByDottedKey($scope.model[$scope.options.key][idx], field);
-                if (typeof dottedValue !== 'undefined') {
-                    params.push(dottedValue);
-                }
-            }
-        });
-
-        try {
-            var caption = vsprintf($scope.options.templateOptions.panel.header.captionFormat, params);
-        } catch(err) {
-            caption = '';
-        } finally {
-            return caption;
-        }
-    }
-
-    function getSelectValue(fieldIdx, idx) {
-        var options = $scope.options.templateOptions.fields[fieldIdx].templateOptions.options;
-        var keyName = $scope.options.templateOptions.fields[fieldIdx].key;
-        var keyValue = getValueByDottedKey($scope.model[$scope.options.key][idx], keyName);
-
-        return options[keyValue] || '';
-    }
-
-    function getValueByDottedKey(o, s) {
-        if (typeof s !== 'undefined') {
-            s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-            s = s.replace(/^\./, '');           // strip a leading dot
-            var a = s.split('.');
-            for (var i = 0, n = a.length; i < n; ++i) {
-                var k = a[i];
-                if (k in o) {
-                    o = o[k];
-                } else {
-                    return;
-                }
-            }
-        }
-
-        return o;
-    }
-}])
-
-.service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
-    this.configuration = function() {
-        var self = this;
-
-        self.url = '';
-        self.method = 'get';
-        self.delay = 250;
-
-        self.idField = 'id';
-        self.dataAccessor = '';
-        self.termParam = 'query';
-        self.termAccessor = 'term';
-        self.pageParam = 'page';
-        self.pageAccessor = 'page';
-
-        self.data = function(params) {
-            var data = {};
-            data[self.cfg.termParam] = params[self.cfg.termAccessor];
-            data[self.cfg.pageParam] = params[self.cfg.pageAccessor];
-            return data;
-        };
-
-        self.processResults = function(data, page) {
-            // access the target array
-            if (self.cfg.dataAccessor !== '') {
-                var accessor = self.cfg.dataAccessor.split('--');
-                do {
-                    var a = accessor.splice(0, 1);
-                    if (angular.isNumber(a)) {
-                        a = a * 1;
-                    }
-                    data = data[a];
-                } while (accessor.length > 0);
-            }
-
-            // make sure we have an id
-            if (self.cfg.idField !== 'id') {
-                data.forEach(function(elem, ndx, arr) {
-                    arr[ndx].id = arr[ndx][self.cfg.idField];
-                });
-            }
-
-            return {
-                results: data
-            };
-        };
-
-        self.templateResult = function(data) {
-            return data.text;
-        };
-
-        self.templateSelection = function(data) {
-            return data.text;
-        };
-
-        self.escapeMarkup = function(markup) {
-            return markup;
-        };
-
-        self.getConfig = function(config) {
-            if (typeof config === 'undefined') {
-                config = {};
-            }
-            self.cfg = angular.merge({}, self, config);
-            return {
-                ajax: {
-                    type: self.cfg.method,
-                    method: self.cfg.method,
-                    dataType: 'json',
-                    delay: self.cfg.delay,
-                    cache: true,
-                    transport: self.cfg.jTransport,
-                    url: self.cfg.url,
-                    data: self.cfg.data,
-                    params: self.cfg.data,
-                    processResults: self.cfg.processResults
-                },
-                templateResult: self.cfg.templateResult,
-                templateSelection: self.cfg.templateSelection,
-                escapeMarkup: self.cfg.escapeMarkup
-            };
-        };
-        self.getConfig({});
-
-        self.jTransport = function(params, success, failure) {
-            var $request = $.ajax(params);
-
-            $request.then(success);
-            $request.fail(failure);
-
-            return $request;
-        };
-
-        self.aTransport = function(params, success, failure) {
-            var timeout = $q.defer();
-
-            params.method = params.type;
-            params.params = params.data;
-
-            angular.extend({
-                timeout: timeout
-            }, params);
-
-            $http(params).then(function(response) {
-                success(response.data);
-            }, failure);
-
-            return {
-                abort: timeout.resolve
-            };
-        };
-    };
 }]);
+
+angular.module('formlyEnnosol')
+    .service('formlyEnnosolCfg', ['$q', '$http', function($q, $http) {
+        this.configuration = function() {
+            var self = this;
+
+            self.url = '';
+            self.method = 'get';
+            self.delay = 250;
+
+            self.idField = 'id';
+            self.dataAccessor = '';
+            self.termParam = 'query';
+            self.termAccessor = 'term';
+            self.pageParam = 'page';
+            self.pageAccessor = 'page';
+
+            self.data = function(params) {
+                var data = {};
+                data[self.cfg.termParam] = params[self.cfg.termAccessor];
+                data[self.cfg.pageParam] = params[self.cfg.pageAccessor];
+                return data;
+            };
+
+            self.processResults = function(data, page) {
+                // access the target array
+                if (self.cfg.dataAccessor !== '') {
+                    var accessor = self.cfg.dataAccessor.split('--');
+                    do {
+                        var a = accessor.splice(0, 1);
+                        if (angular.isNumber(a)) {
+                            a = a * 1;
+                        }
+                        data = data[a];
+                    } while (accessor.length > 0);
+                }
+
+                // make sure we have an id
+                if (self.cfg.idField !== 'id') {
+                    data.forEach(function(elem, ndx, arr) {
+                        arr[ndx].id = arr[ndx][self.cfg.idField];
+                    });
+                }
+
+                return {
+                    results: data
+                };
+            };
+
+            self.templateResult = function(data) {
+                return data.text;
+            };
+
+            self.templateSelection = function(data) {
+                return data.text;
+            };
+
+            self.escapeMarkup = function(markup) {
+                return markup;
+            };
+
+            self.getConfig = function(config) {
+                if (typeof config === 'undefined') {
+                    config = {};
+                }
+                self.cfg = angular.merge({}, self, config);
+                return {
+                    ajax: {
+                        type: self.cfg.method,
+                        method: self.cfg.method,
+                        dataType: 'json',
+                        delay: self.cfg.delay,
+                        cache: true,
+                        transport: self.cfg.jTransport,
+                        url: self.cfg.url,
+                        data: self.cfg.data,
+                        params: self.cfg.data,
+                        processResults: self.cfg.processResults
+                    },
+                    templateResult: self.cfg.templateResult,
+                    templateSelection: self.cfg.templateSelection,
+                    escapeMarkup: self.cfg.escapeMarkup
+                };
+            };
+            self.getConfig({});
+
+            self.jTransport = function(params, success, failure) {
+                var $request = $.ajax(params);
+
+                $request.then(success);
+                $request.fail(failure);
+
+                return $request;
+            };
+
+            self.aTransport = function(params, success, failure) {
+                var timeout = $q.defer();
+
+                params.method = params.type;
+                params.params = params.data;
+
+                angular.extend({
+                    timeout: timeout
+                }, params);
+
+                $http(params).then(function(response) {
+                    success(response.data);
+                }, failure);
+
+                return {
+                    abort: timeout.resolve
+                };
+            };
+        };
+    }]);
+
+angular.module('formlyEnnosol')
+    .controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
+        var unique = 1;
+
+        $scope.formOptions = {formState: $scope.formState};
+        $scope.addNew = addNew;
+        $scope.removeItem = removeItem;
+        $scope.copyFields = copyFields;
+        $scope.getPanelHeader = getPanelHeader;
+        $scope.getSelectValue = getSelectValue;
+
+        function copyFields(fields) {
+            fields = angular.copy(fields);
+            addRandomIds(fields);
+            return fields;
+        }
+
+        function addNew() {
+            $scope.model[$scope.options.key] = $scope.model[$scope.options.key] || [];
+            var repeatsection = $scope.model[$scope.options.key];
+            var lastSection = repeatsection[repeatsection.length - 1];
+            var newsection = {open: true}; // open:true for the sortable-repeat-section template
+            repeatsection.push(newsection);
+        }
+
+        function removeItem(idx) {
+            $scope.model[$scope.options.key].splice(idx, 1);
+        }
+
+        function addRandomIds(fields) {
+            unique++;
+            angular.forEach(fields, function(field, index) {
+                if (field.fieldGroup) {
+                    addRandomIds(field.fieldGroup);
+                    return; // fieldGroups don't need an ID
+                }
+
+                if (field.templateOptions && field.templateOptions.fields) {
+                    addRandomIds(field.templateOptions.fields);
+                }
+
+                field.id = field.id || (field.key + '_' + index + '_' + unique + getRandomInt(0, 9999));
+            });
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function getPanelHeader(idx) {
+            var params = [];
+            var dottedValue;
+
+            //console.log('$scope.options.templateOptions', $scope.options.templateOptions);
+            angular.forEach($scope.options.templateOptions.panel.header.captionFields, function(field, index) {
+                // Call custom function
+                if (field.substr(0, 1) === '@') {
+                    // Replace variables
+                    field = field.replace("$idx", idx);
+
+                    // Call function
+                    params.push($scope.$eval(field.substr(1)));
+                // Get model value by dot-format key
+                } else {
+                    dottedValue = getValueByDottedKey($scope.model[$scope.options.key][idx], field);
+                    if (typeof dottedValue !== 'undefined') {
+                        params.push(dottedValue);
+                    }
+                }
+            });
+
+            try {
+                var caption = vsprintf($scope.options.templateOptions.panel.header.captionFormat, params);
+            } catch(err) {
+                caption = '';
+            } finally {
+                return caption;
+            }
+        }
+
+        function getSelectValue(fieldIdx, idx) {
+            var options = $scope.options.templateOptions.fields[fieldIdx].templateOptions.options;
+            var keyName = $scope.options.templateOptions.fields[fieldIdx].key;
+            var keyValue = getValueByDottedKey($scope.model[$scope.options.key][idx], keyName);
+
+            return options[keyValue] || '';
+        }
+
+        function getValueByDottedKey(o, s) {
+            if (typeof s !== 'undefined') {
+                s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+                s = s.replace(/^\./, '');           // strip a leading dot
+                var a = s.split('.');
+                for (var i = 0, n = a.length; i < n; ++i) {
+                    var k = a[i];
+                    if (k in o) {
+                        o = o[k];
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+            return o;
+        }
+    }]);
+
+angular.module('formlyEnnosol')
+    .directive('nslError', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                // Error block added to DOM (by ng-if)
+                $(element).next().addClass('has-error');
+
+                // Error block removed from DOM (by ng-if)
+                scope.$on('$destroy', function() {
+                    $(element).next().removeClass('has-error');
+                });
+            }
+        };
+    });
+
+angular.module('formlyEnnosol')
+    .directive('nslFormlyCron', function() {
+        return {
+            restrict: 'C',
+            require: 'ngModel',
+            link: function(scope, element, attrs, ngModel) {
+                scope.$watch('cronOutput', function() {
+                   ngModel.$setViewValue(scope.cronOutput);
+                });
+            }
+        };
+    });
+
+angular.module('formlyEnnosol')
+    .directive('nslFormlyDatepicker', ['$timeout', function($timeout) {
+        return {
+            restrict: 'CA',
+            scope: {
+                datePickerOptions: '='
+            },
+            link: function(scope, element) {
+                // Extend the default options with the user defined options
+                var options = angular.extend({
+                    autoclose: true
+                }, scope.datePickerOptions);
+
+                // Zero timeout for access the compiled template
+                $timeout(function() {
+                    // Cut off UTC info
+                    $(element).val($(element).val().substring(0, 10));
+
+                    // Trigger input event for updating ng-model
+                    $(element).datepicker(options)
+                        .on('changeDate', function() {
+                            element.trigger('input');
+                        });
+                }, 0);
+            }
+        };
+    }]);
+
+angular.module('formlyEnnosol')
+    .directive('nslFormlyTimepicker', ['$timeout', function($timeout) {
+        return {
+            restrict: 'C',
+            link: function(scope, element) {
+                // Zero timeout for access the compiled template
+                $timeout(function() {
+                    // Cut off UTC info
+                    $(element).clockpicker({
+                        placement: 'bottom',
+                        align: 'left',
+                        autoclose: true,
+                        'default': 'now'
+                    });
+
+                    // Trigger input event for updating ng-model
+                    $(element).clockpicker()
+                        .on('change', function() {
+                            element.find('input').trigger('input');
+                        });
+                }, 0);
+            }
+        };
+    }]);
+
+angular.module('formlyEnnosol')
+    .directive('nslTouchspin', ['$timeout', function ($timeout) {
+        return {
+            restrict: 'A',
+            scope: {
+                min: '=',
+                max: '=',
+                step: '=',
+                stepInterval: '=',
+                decimals: '=',
+                boostAt: '=',
+                maxBoostedStep: '=',
+                prefix: '=',
+                postfix: '=',
+                verticalButtons: '='
+            },
+            link: function(scope, element, attrs) {
+                if (typeof scope.min === 'undefined') {
+                    scope.min = Number.MIN_SAFE_INTEGER || -Number.MAX_VALUE;
+                }
+                if (typeof scope.max === 'undefined') {
+                    scope.max = Number.MAX_SAFE_INTEGER || Number.MAX_VALUE;
+                }
+                if (typeof scope.step === 'undefined' || scope.step === 0) {
+                    scope.step = 1;
+                }
+
+                $(element).TouchSpin({
+                    min: scope.min,
+                    max: scope.max,
+                    step: scope.step,
+                    stepinterval: scope.stepInterval || 50,
+                    decimals: scope.decimals || 0,
+                    boostat: scope.boostAt || 5,
+                    maxboostedstep: scope.maxBoostedStep || 10,
+                    prefix: scope.prefix || '',
+                    postfix: scope.postfix || '',
+                    verticalbuttons: scope.verticalButtons || false
+                });
+
+                // Zero timeout for access the compiled template
+                $timeout(function() {
+                    // Trigger input event for updating ng-model
+                    $(element)
+                        .on('change', function() {
+                            element.trigger('input');
+                        });
+                }, 0);
+            }
+        };
+    }]);
 
 angular.module("formlyEnnosol").run(["$templateCache", function($templateCache) {$templateCache.put("/src/templates/addons.html","<div ng-class=\"{\'input-group\': to.addonLeft || to.addonRight}\"><div class=\"input-group-addon {{to.addonLeft.bgClassName}}\" ng-if=\"to.addonLeft\" ng-style=\"{cursor: to.addonLeft.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonLeft.onClick(options, this)\"><i class=\"{{to.addonLeft.className}}\" ng-if=\"to.addonLeft.className\"></i> <span ng-if=\"to.addonLeft.text\" ng-bind-html=\"to.addonLeft.text\"></span></div><formly-transclude></formly-transclude><div class=\"input-group-addon {{to.addonRight.bgClassName}}\" ng-if=\"to.addonRight\" ng-style=\"{cursor: to.addonRight.onClick ? \'pointer\' : \'inherit\'}\" ng-click=\"to.addonRight.onClick(options, this)\"><i class=\"{{to.addonRight.className}}\" ng-if=\"to.addonRight.className\"></i> <span ng-if=\"to.addonRight.text\" ng-bind-html=\"to.addonRight.text\"></span></div></div>");
 $templateCache.put("/src/templates/button.html","<div class=\"form-group\" ng-hide=\"to.hide\"><button type=\"button\" title=\"{{to.title}}\" ng-class=\"to.className\" ng-disabled=\"to.disabled\" ng-click=\"to.click(id)\" ng-bind-html=\"to.text\"></button></div>");
@@ -446,7 +468,7 @@ $templateCache.put("/src/templates/coordinate.html","<div class=\"input-group\" 
 $templateCache.put("/src/templates/cron.html","<div ng-hide=\"to.hide\"><cron-selection class=\"nslFormlyCron\" output=\"cronOutput\" config=\"to.cronConfig\" init=\"to.initData\" ng-disabled=\"to.readOnly || to.disabled\" ng-model=\"model[options.key]\"></cron-selection></div>");
 $templateCache.put("/src/templates/date.html","<div class=\"form-group\" ng-hide=\"to.hide\"><input class=\"form-control show text-center nslFormlyDatepicker\" data-provide=\"{{to.readOnly || to.disabled ? \'\' : \'datepicker\'}}\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"to.disabled\" type=\"text\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
 $templateCache.put("/src/templates/daterange.html","<div class=\"form-group\" ng-hide=\"to.hide\"><div class=\"input-daterange input-group\" data-provide=\"datepicker\" data-date-format=\"{{to.datepicker.format || \'yyyy-mm-dd\'}}\" data-date-language=\"{{to.datepicker.language}}\" data-date-weekstart=\"{{to.datepicker.weekStart}}\"><input class=\"form-control show nslFormlyDatepicker\" name=\"start\" ng-model=\"model[options.key][\'start\']\" placeholder=\"{{to.placeholder.start}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"to.disabled\" type=\"text\"> <span class=\"input-group-addon {{to.separator.bgClassName}}\" style=\"min-width:38px;min-height:34px;\"><i class=\"{{to.separator.className}}\" ng-if=\"to.separator.className\"></i> <span ng-if=\"to.separator.text\">{{to.separator.text}}</span></span> <input class=\"form-control show nslFormlyDatepicker\" name=\"end\" ng-model=\"model[options.key][\'end\']\" placeholder=\"{{to.placeholder.end}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"to.disabled\" type=\"text\"></div></div>");
-$templateCache.put("/src/templates/error.html","<div ng-messages=\"fc.$error\" ng-if=\"options.validation.errorExistsAndShouldBeVisible\" class=\"error-messages\"><div uib-tooltip=\"{{ message(fc.$viewValue, fc.$modelValue, this)}}\" tooltip-placement=\"top\" tooltip-is-open=\"true\" tooltip-trigger=\"manual\" ng-message=\"{{ ::name }}\" ng-repeat=\"(name, message) in ::options.validation.messages\" class=\"validationTooltip\"></div></div><formly-transclude></formly-transclude>");
+$templateCache.put("/src/templates/error.html","<div nsl-error=\"\" ng-messages=\"fc.$error\" ng-if=\"options.validation.errorExistsAndShouldBeVisible\" class=\"error-messages\"><div uib-tooltip=\"{{ message(fc.$viewValue, fc.$modelValue, this)}}\" tooltip-placement=\"top\" tooltip-is-open=\"true\" tooltip-trigger=\"manual\" ng-message=\"{{ ::name }}\" ng-repeat=\"(name, message) in ::options.validation.messages\" class=\"validationTooltip\"></div></div><formly-transclude></formly-transclude>");
 $templateCache.put("/src/templates/fieldset.html","<fieldset><legend>{{to.label}} {{to.required ? \'*\' : \'\'}}</legend><formly-transclude></formly-transclude></fieldset>");
 $templateCache.put("/src/templates/input.html","<div class=\"form-group\" ng-hide=\"to.hide\"><input class=\"form-control\" ng-model=\"model[options.key]\" placeholder=\"{{to.placeholder}}\" ng-readonly=\"{{to.readOnly}}\" ng-disabled=\"to.disabled\" type=\"{{to.password ? \'password\' : (to.type ? to.type : \'text\')}}\"> <span class=\"{{to.feedback.className}} form-control-feedback\">{{to.feedback.text}}</span></div>");
 $templateCache.put("/src/templates/label.html","<div class=\"form-group\" ng-hide=\"to.hide\"><label for=\"{{id}}\" class=\"control-label\" ng-show=\"to.label\"><span ng-bind-html=\"to.label\"></span> {{to.required ? \'*\' : \'\'}}</label><div><formly-transclude></formly-transclude></div><em id=\"{{id}}_description\" class=\"help-block\" ng-if=\"options.templateOptions.description\" style=\"opacity:0.6\">{{options.templateOptions.description}}</em></div>");

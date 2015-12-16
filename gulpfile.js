@@ -37,18 +37,24 @@ gulp.task('template', function() {
             header: 'angular.module("<%= module %>").run(["$templateCache", function($templateCache) {'
 
         }))
-        .pipe(gulp.dest('.tmp'));
+        .pipe(gulp.dest('.tmp/templates'));
 });
 
 // Then save the main provider in the same tmp dir
 gulp.task('mkSrc', function() {
-    return gulp.src('./src/modules/*.js')
+    return gulp.src('./src/*/*.js')
     // .pipe(concat('all.js'))
     .pipe(gulp.dest('./.tmp/'));
 });
 
 gulp.task('build', ['template', 'mkSrc'], function() {
-    return gulp.src('./.tmp/*.js')
+    return gulp.src([
+            './.tmp/modules/*.js',
+            './.tmp/services/*.js',
+            './.tmp/controllers/*.js',
+            './.tmp/directives/*.js',
+            './.tmp/templates/*.js'
+        ])
         .pipe(ngAnnotate())
         .pipe(concat(finalName + ".js"))
         .pipe(gulp.dest('./dist'))
