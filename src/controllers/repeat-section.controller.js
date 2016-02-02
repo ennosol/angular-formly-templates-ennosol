@@ -1,6 +1,7 @@
 angular.module('formlyEnnosol')
     .controller('RepeatSectionController', ['$scope', '$timeout', function($scope, $timeout) {
         var unique = 1;
+        var uniqueFieldsArray = [];
 
         $scope.formOptions = {formState: $scope.formState};
         $scope.addNew = addNew;
@@ -10,9 +11,19 @@ angular.module('formlyEnnosol')
         $scope.getSelectValue = getSelectValue;
 
         function copyFields(fields) {
-            fields = angular.copy(fields);
-            addRandomIds(fields);
-            return fields;
+            $scope.toFields = fields;
+
+            $scope.$watch('toFields', function() {
+                angular.forEach(uniqueFieldsArray, function(fields) {
+                    angular.merge(fields, $scope.toFields);
+                });
+            }, true);
+
+            var uniqueFields = angular.copy($scope.toFields);
+            addRandomIds(uniqueFields);
+            uniqueFieldsArray.push(uniqueFields);
+
+            return uniqueFields;
         }
 
         function addNew() {
