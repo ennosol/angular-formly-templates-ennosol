@@ -11,8 +11,11 @@ angular.module('formlyEnnosol')
         $scope.getSelectValue = getSelectValue;
 
         function copyFields(fields) {
+            // Pointer to templateoptions fields
             $scope.toFields = fields;
 
+            // ng-repeat creates own scope for every repeat-item.
+            // This watch will refresh all sub-scopes when the main $scope.fields changed
             $scope.$watch('toFields', function() {
                 angular.forEach(uniqueFieldsArray, function(fields) {
                     angular.merge(fields, $scope.toFields);
