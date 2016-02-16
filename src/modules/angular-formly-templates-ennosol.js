@@ -65,6 +65,10 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
         templateUrl: '/src/templates/static.html',
         wrapper: ['addons', 'label']
     }, {
+        name: 'img',
+        templateUrl: '/src/templates/img.html',
+        wrapper: ['addons', 'label']
+    }, {
         name: 'textarea',
         templateUrl: '/src/templates/textarea.html',
         wrapper: ['addons', 'label', 'validation']
