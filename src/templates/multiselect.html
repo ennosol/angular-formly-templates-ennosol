@@ -1,5 +1,5 @@
 <div ng-hide="to.hide">
-    <select ts-select2="to.config" ng-change="to.change()" ng-model="model[options.key]" multiple="multiple" >
+    <select ts-select2="to.config" ng-change="to.ngChange()" ng-model="model[options.key]" multiple="multiple" >
         <option value="{{key}}" ng-repeat="(key, value) in to.options">{{value | translate}}</option>
     </select>
 </div>
