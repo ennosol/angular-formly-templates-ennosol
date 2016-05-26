@@ -1,7 +1,7 @@
 <div class="form-group" ng-hide="to.hide">
     <label for="{{id}}" class="control-label" ng-show="to.label">
         <span ng-bind-html="to.label"></span>
-        {{to.required ? '*' : ''}}
+        <span ng-if="to.required" class="required-field">*</span>
     </label>
     <div>
         <formly-transclude></formly-transclude>
