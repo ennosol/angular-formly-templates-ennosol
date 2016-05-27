@@ -3,6 +3,7 @@
         <div ng-messages="fc.$error" class="validation-tooltip-message message error-messages">
             <div ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="message">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div>
         </div>
+        <div class="validation-tooltip-triangle"></div>
     </div>
 </div>
 <formly-transclude></formly-transclude>
