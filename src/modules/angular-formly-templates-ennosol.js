@@ -20,7 +20,7 @@ angular.module('formlyEnnosol', ['formly', 'NgSwitchery', 'tsSelect2', 'angular-
     formlyConfigProvider.setType([{
         name: 'nested',
         wrapper: ['fieldset'],
-        template: '<formly-form model="model[options.key]" fields="options.data.fields"></formly-form>'
+        template: '<formly-form model="model[options.key]" fields="options.fieldGroup"></formly-form>'
     }, {
         name: 'button',
         templateUrl: '/src/templates/button.html'
