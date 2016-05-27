@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="../bower_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css">
     <link rel="stylesheet" href="../bower_components/clockpicker/dist/bootstrap-clockpicker.min.css">
     <link rel="stylesheet" href="../bower_components/angular-cron-jobs/dist/angular-cron-jobs.css">
+    <link rel="stylesheet" href="../src/css/angular-formly-templates-ennosol.css">
 
     <style>
         .datepicker {
@@ -75,17 +76,24 @@
     <script type="text/javascript" src="../bower_components/ng-switchery/src/ng-switchery.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
+    <script type="text/javascript" src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="../bower_components/clockpicker/dist/bootstrap-clockpicker.min.js"></script>
     <script type="text/javascript" src="../bower_components/select2/dist/js/select2.full.min.js"></script>
     <script type="text/javascript" src="../bower_components/select2/dist/js/i18n/hu.js"></script>
     <script type="text/javascript" src="../bower_components/angular-ts-select2/ts-select2.js"></script>
     <script type="text/javascript" src="../bower_components/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js"></script>
+
     <script type="text/javascript" src="../bower_components/angular-cron-jobs/dist/angular-cron-jobs.min.js"></script>
+
 
     <script type="text/javascript" src="../src/modules/angular-formly-templates-ennosol.js"></script>
     <script type="text/javascript" src="../src/controllers/repeat-section.controller.js"></script>
     <script type="text/javascript" src="../src/directives/nsl-error.directive.js"></script>
+
+
     <script type="text/javascript" src="../src/directives/nsl-formly-cron.directive.js"></script>
+
+
     <script type="text/javascript" src="../src/directives/nsl-formly-datepicker.directive.js"></script>
     <script type="text/javascript" src="../src/directives/nsl-formly-timepicker.directive.js"></script>
     <script type="text/javascript" src="../src/directives/nsl-touchspin.directive.js"></script>
@@ -145,7 +153,6 @@
             };
 
             vm.fields = [
-
                 {
                     key: 'username',
                     type: 'static',
@@ -174,8 +181,9 @@
                             className: 'glyphicon glyphicon-remove text-danger'
                         }
                     }
-                },
-                {
+                }
+            ];
+                /*,{
                     key: 'cronjob',
                     type: 'cron',
                     className: 'col-sm-12',
@@ -702,7 +710,8 @@
                                 templateOptions: {
                                     label: 'Are you executing this trade?'
                                 }
-                            },
+                            }
+                            /*,
                             {
                                 hideExpression: '!formState.selfExecuting',
                                 fieldGroup: [
@@ -743,7 +752,7 @@
                         ]
                     }
                 }
-            ];
+            ];*/
 
             vm.onSubmit = function() {
                 console.log('submitted model:', vm.model);

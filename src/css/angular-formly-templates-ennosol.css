@@ -1,0 +1,30 @@
+.validation-tooltip-container {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    z-index: 10000;
+}
+
+.validation-tooltip-pos {
+    position:absolute;
+    bottom:-14px;
+    text-align:center;
+    padding-right: 30px;
+    width: 100%;
+}
+
+.validation-tooltip-message {
+    background-color: #a94442;
+    opacity: .8;
+    color:#fff;
+    display: inline-block;
+    width: auto;
+    max-width:200px;
+    padding:3px 8px;
+    text-align: center;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}

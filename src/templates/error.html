@@ -1,4 +1,8 @@
-<div nsl-error ng-messages="fc.$error" ng-if="options.validation.errorExistsAndShouldBeVisible" class="error-messages">
-    <div uib-tooltip="{{ message(fc.$viewValue, fc.$modelValue, this)}}" tooltip-placement="top" tooltip-is-open="true" tooltip-trigger="manual" ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="validationTooltip"></div>
+<div nsl-error class="validation-tooltip-container" ng-if="options.validation.errorExistsAndShouldBeVisible">
+    <div class="validation-tooltip-pos">
+        <div ng-messages="fc.$error" class="validation-tooltip-message message error-messages">
+            <div ng-message="{{ ::name }}" ng-repeat="(name, message) in ::options.validation.messages" class="message">{{ message(fc.$viewValue, fc.$modelValue, this)}}</div>
+        </div>
+    </div>
 </div>
 <formly-transclude></formly-transclude>
