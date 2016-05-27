@@ -40,6 +40,12 @@ gulp.task('template', function() {
         .pipe(gulp.dest('.tmp/templates'));
 });
 
+gulp.task('css', function() {
+    return gulp.src('src/css/*css')
+
+    .pipe(gulp.dest('./dist'));
+});
+
 // Then save the main provider in the same tmp dir
 gulp.task('mkSrc', function() {
     return gulp.src('./src/*/*.js')
@@ -47,7 +53,7 @@ gulp.task('mkSrc', function() {
     .pipe(gulp.dest('./.tmp/'));
 });
 
-gulp.task('build', ['template', 'mkSrc'], function() {
+gulp.task('build', ['template', 'mkSrc', 'css'], function() {
     return gulp.src([
             './.tmp/modules/*.js',
             './.tmp/services/*.js',
