@@ -1,4 +1,18 @@
 <div class="form-group" ng-hide="to.hide" >
-    <input class="form-control show text-center nslFormlyDatepicker" data-provide="{{to.readOnly || to.disabled ? '' : 'datepicker'}}" ng-model="model[options.key]" placeholder="{{to.placeholder}}" ng-readonly="{{to.readOnly}}" ng-disabled="to.disabled" type="text" data-date-format="{{to.datepicker.format || 'yyyy-mm-dd'}}" data-date-language="{{to.datepicker.language}}" data-date-weekstart="{{to.datepicker.weekStart}}">
+    <input
+        type="text"
+        class="form-control show text-center nslFormlyDatepicker"
+        placeholder="{{to.placeholder}}"
+        data-provide="{{to.readOnly || to.disabled ? '' : 'datepicker'}}"
+        ng-model="model[options.key]"
+        ng-readonly="{{to.readOnly}}"
+        ng-disabled="to.disabled"
+        data-date-format="{{to.datepicker.format || 'yyyy-mm-dd'}}"
+        data-date-language="{{to.datepicker.language}}"
+        data-date-weekstart="{{to.datepicker.weekStart}}"
+        data-date-start-view="{{to.datepicker.startView}}"
+        data-date-min-view-mode="{{to.datepicker.minViewMode}}"
+        data-date-max-view-mode="{{to.datepicker.maxViewMode}}"
+    >
     <span class="{{to.feedback.className}} form-control-feedback">{{to.feedback.text}}</span>
 </div>
