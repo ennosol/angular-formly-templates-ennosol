@@ -29,6 +29,8 @@
                 </div>
             </div>
 
+            <div class="clearfix"></div>
+
             <p>
                 <button ng-repeat="button in to.buttons" type="button" ng-class="button.className" ng-click="button.click($event)" ng-bind-html="button.text" title="{{button.title}}" class="btn"></button>
             </p>
